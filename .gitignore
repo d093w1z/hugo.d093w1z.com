@@ -17,5 +17,6 @@ bin-release/
 # Hugo
 public/
 resources/
+*.lock
 
 # Backup Files
