@@ -31,7 +31,7 @@ O Hugo vem com vários [Shortcodes Internos](https://gohugo.io/content-managemen
 
 ## Shortcode do Twitter
 
-{{< x user="SanDiegoZoo" id="1453110110599868418" >}}
+{{< tweet user="SanDiegoZoo" id="1453110110599868418" >}}
 
 <br>
 

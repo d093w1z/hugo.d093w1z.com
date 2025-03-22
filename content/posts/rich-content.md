@@ -31,7 +31,7 @@ Hugo ships with several [Built-in Shortcodes](https://gohugo.io/content-manageme
 
 ## Twitter Shortcode
 
-{{< x user="SanDiegoZoo" id="1453110110599868418" >}}
+{{< twitter user="SanDiegoZoo" id="1453110110599868418" >}}
 
 <br>
 
