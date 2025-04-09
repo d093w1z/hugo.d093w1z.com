@@ -23,7 +23,7 @@ noClasses = false
 unsafe = true
 
 [params]
-author = "d093w1z"
+author = "Mukesh M. Tandale"
 # license = '<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA-4.0</a>'
 description = "Mukesh Tandale's personal website"
 keywords = "blog, developer, personal, academic-website, portfolio-website, d093w1z, portfolio, engineering, linux, computers"
