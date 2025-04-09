@@ -1,0 +1,21 @@
+<main class="container mx-auto px-4 max-w-3xl">
+  <h1 class="text-4xl font-bold">{{ .Site.Data.resume.basics.name }}</h1>
+  <p class="text-lg text-gray-600">{{ .Site.Data.resume.basics.label }}</p>
+
+  <div class="mt-4">
+    <p>Email: <a href="mailto:{{ .Site.Data.resume.basics.email }}">{{ .Site.Data.resume.basics.email }}</a></p>
+    <p>Phone: {{ .Site.Data.resume.basics.phone }}</p>
+    <p>Location: {{ .Site.Data.resume.basics.location.city }}, {{ .Site.Data.resume.basics.location.region }}</p>
+    <p>GitHub: <a href="{{ (index .Site.Data.resume.basics.profiles 1).url }}">{{ (index
+        .Site.Data.resume.basics.profiles 1).username }}</a></p>
+  </div>
+
+  <h2 class="text-2xl font-semibold mt-8">Work Experience</h2>
+  {{ range .Site.Data.resume.work }}
+  <div class="mt-4">
+    <h3 class="font-semibold">{{ .position }} at {{ .name }}</h3>
+    <p class="text-sm text-gray-600">{{ .startDate }} – {{ if .endDate }}{{ .endDate }}{{ else }}Present{{ end }}</p>
+    <p class="mt-1">{{ .summary }}</p>
+  </div>
+  {{ end }}
+</main>

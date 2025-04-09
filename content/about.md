@@ -2,7 +2,7 @@
 title: About
 description: About me, Mukesh Tandale
 date: 2019-02-28
-aliases: [about-us, about-hugo, contact]
+aliases: [about-us, about-d093w1z, d093w1z]
 author: d093w1z
 ---
 
