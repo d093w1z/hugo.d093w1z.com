@@ -1,8 +1,8 @@
 ---
-title: 'Résumé'
-date: 2024-04-05
+title: Résumé
+date: 2025-04-09 00:09:11
 slug: resume
-layout: resume
+author: d093w1z
 ---
 
 {{< resume >}}
