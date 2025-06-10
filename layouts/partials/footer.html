@@ -5,7 +5,7 @@
     {{ .Site.Params.since }} -
     {{ end }}
     {{ now.Year }}
-    {{ with .Site.Params.author }} {{ . }} {{ end }}
+    {{ block "title" . }}{{ .Site.Params.HeadTitle | default .Site.Title }}{{ end }}
     {{ if (and .Site.Params.license) }}
     {{ i18n "licensed_under" }} {{ .Site.Params.license | safeHTML }}
     ·
