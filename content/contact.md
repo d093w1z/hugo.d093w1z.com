@@ -3,4 +3,4 @@ title = "Contact"
 slug = "contact"
 +++
 
-Follow me, @d093w1z.
+[Reach out to me](mailto:contact@d093w1z.com) or [request my resume](/resume)
