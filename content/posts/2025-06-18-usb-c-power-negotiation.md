@@ -3,12 +3,15 @@ author: d093w1z
 title: USB-C Power Negotiation
 date: 2025-06-18T18:11:15.000Z
 lastmod: 2025-06-18T18:11:15.000Z
-description: ''
+description: null
 tags:
   - usb-c
   - usb
   - power
-categories: []
+categories:
+  - hardware
+  - technology
+  - device
 slug: usb-c-power-negotiation
 draft: false
 toc: true
