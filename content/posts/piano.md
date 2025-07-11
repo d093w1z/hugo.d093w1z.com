@@ -17,7 +17,9 @@ draft: false
 toc: true
 ---
 
-<!DOCTYPE html>
+<iframe 
+    srcdoc='
+      <!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -354,3 +356,6 @@ toc: true
 </body>
 
 </html>
+    '
+    width="100%" height="400px" style="border:1px solid #ccc;">
+  </iframe>
