@@ -15,26 +15,27 @@ slug: interactive-piano-daw
 draft: false
 toc: true
 ---
+
 # Interactive Piano DAW
 
-<iframe id="myFrame" width="100%" height="900px" srcdoc='&lt;!DOCTYPE html&gt;
+<iframe id="myFrame" width="100%" height="900px" srcdoc="&lt;!DOCTYPE html&gt;
 &lt;html lang=&quot;en&quot;&gt;
 
 &lt;head&gt;
-  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;
-  &lt;meta charset=&quot;UTF-8&quot;&gt;
-  &lt;title&gt;Improved Piano Roll DAW&lt;/title&gt;
-  &lt;style&gt;
-    body {
-      font-family: sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: #222;
-      color: #ddd;
-      margin: 0;
-      padding: 20px;
-    }
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;title&gt;Improved Piano Roll DAW&lt;/title&gt;
+&lt;style&gt;
+body {
+font-family: sans-serif;
+display: flex;
+flex-direction: column;
+align-items: center;
+background: #222;
+color: #ddd;
+margin: 0;
+padding: 20px;
+}
 
     #controls {
       margin: 10px;
@@ -126,36 +127,37 @@ toc: true
     .playing {
       outline: 2px solid #ff0;
     }
-  &lt;/style&gt;
+
+&lt;/style&gt;
 &lt;/head&gt;
 
 &lt;body&gt;
-  &lt;h2&gt;Improved Piano Roll DAW&lt;/h2&gt;
-  &lt;div id=&quot;controls&quot;&gt;
-    &lt;button id=&quot;play&quot;&gt;Play&lt;/button&gt;
-    &lt;button id=&quot;stop&quot;&gt;Stop&lt;/button&gt;
-    &lt;button id=&quot;clear&quot;&gt;Clear All&lt;/button&gt;
-    BPM: &lt;input type=&quot;number&quot; id=&quot;bpm&quot; value=&quot;120&quot; min=&quot;30&quot; max=&quot;300&quot; style=&quot;width:60px;&quot;&gt;
-    Instrument:
-    &lt;select id=&quot;instrument&quot;&gt;
-      &lt;option value=&quot;synth&quot;&gt;Synth&lt;/option&gt;
-      &lt;option value=&quot;piano&quot;&gt;Piano&lt;/option&gt;
-    &lt;/select&gt;
-    &lt;button id=&quot;save&quot;&gt;Save&lt;/button&gt;
-    &lt;button id=&quot;load&quot;&gt;Load&lt;/button&gt;
-    &lt;button id=&quot;export&quot;&gt;Export MIDI&lt;/button&gt;
-  &lt;/div&gt;
-  &lt;div id=&quot;main-container&quot;&gt;
-    &lt;div id=&quot;timing-bar&quot;&gt;&lt;/div&gt;
-    &lt;div id=&quot;piano-roll-container&quot;&gt;
-      &lt;div id=&quot;piano&quot;&gt;&lt;/div&gt;
-      &lt;div id=&quot;piano-roll&quot;&gt;&lt;/div&gt;
-    &lt;/div&gt;
-  &lt;/div&gt;
-  &lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.39/Tone.min.js&quot;&gt;&lt;/script&gt;
-  &lt;script src=&quot;https://cdn.jsdelivr.net/npm/midiwriter-js@2.1.3/dist/MidiWriter.min.js&quot;&gt;&lt;/script&gt;
-  &lt;script&gt;
-    // Build note list for C3 to C5
+&lt;h2&gt;Improved Piano Roll DAW&lt;/h2&gt;
+&lt;div id=&quot;controls&quot;&gt;
+&lt;button id=&quot;play&quot;&gt;Play&lt;/button&gt;
+&lt;button id=&quot;stop&quot;&gt;Stop&lt;/button&gt;
+&lt;button id=&quot;clear&quot;&gt;Clear All&lt;/button&gt;
+BPM: &lt;input type=&quot;number&quot; id=&quot;bpm&quot; value=&quot;120&quot; min=&quot;30&quot; max=&quot;300&quot; style=&quot;width:60px;&quot;&gt;
+Instrument:
+&lt;select id=&quot;instrument&quot;&gt;
+&lt;option value=&quot;synth&quot;&gt;Synth&lt;/option&gt;
+&lt;option value=&quot;piano&quot;&gt;Piano&lt;/option&gt;
+&lt;/select&gt;
+&lt;button id=&quot;save&quot;&gt;Save&lt;/button&gt;
+&lt;button id=&quot;load&quot;&gt;Load&lt;/button&gt;
+&lt;button id=&quot;export&quot;&gt;Export MIDI&lt;/button&gt;
+&lt;/div&gt;
+&lt;div id=&quot;main-container&quot;&gt;
+&lt;div id=&quot;timing-bar&quot;&gt;&lt;/div&gt;
+&lt;div id=&quot;piano-roll-container&quot;&gt;
+&lt;div id=&quot;piano&quot;&gt;&lt;/div&gt;
+&lt;div id=&quot;piano-roll&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.39/Tone.min.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;https://cdn.jsdelivr.net/npm/midiwriter-js@2.1.3/dist/MidiWriter.min.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+// Build note list for C3 to C5
 
     const MidiWriter = window.MidiWriter;
 
@@ -353,8 +355,8 @@ toc: true
       a.href = url; a.download = &quot;pattern.mid&quot;;
       a.click();
     });
-  &lt;/script&gt;
+
+&lt;/script&gt;
 &lt;/body&gt;
 
-&lt;/html&gt;'></iframe>
-
+&lt;/html&gt;"></iframe>
