@@ -355,8 +355,6 @@ Instrument:
       a.href = url; a.download = &quot;pattern.mid&quot;;
       a.click();
     });
-
 &lt;/script&gt;
 &lt;/body&gt;
-
 &lt;/html&gt;"></iframe>
