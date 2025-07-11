@@ -17,7 +17,7 @@ draft: false
 toc: true
 ---
 
-<iframe id="myFrame" width="100%" height="100%" srcdoc='<!DOCTYPE html>
+<iframe id="myFrame" width="100%" height="900px" srcdoc='<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -88,6 +88,8 @@ toc: true
       grid-template-columns: repeat(16, 31px);
       gap: 1px;
       margin-bottom: 2px;
+      margin-top: 2px;
+
     }
 
     .time-cell {
