@@ -17,11 +17,7 @@ draft: false
 toc: true
 ---
 
-<iframe id="myFrame" width="100%" height="400"></iframe>
-
-<script>
-  const htmlContent = `
-    <!DOCTYPE html>
+<iframe id="myFrame" width="100%" height="100%" srcdoc='<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -122,6 +118,7 @@ toc: true
     .playing {
       outline: 2px solid #ff0;
     }
+
   </style>
 </head>
 
@@ -172,14 +169,14 @@ toc: true
     const gridMarkingColor = "#fff";
 
     const grid = [];
-    const pianoRoll = document.getElementById('piano-roll');
-    const piano = document.getElementById('piano');
-    const timingBar = document.getElementById('timing-bar');
+    const pianoRoll = document.getElementById("piano-roll");
+    const piano = document.getElementById("piano");
+    const timingBar = document.getElementById("timing-bar");
 
     const timeCells = [];
     for (let x = 0; x < cols; x++) {
-      const tcell = document.createElement('div');
-      tcell.className = 'time-cell';
+      const tcell = document.createElement("div");
+      tcell.className = "time-cell";
       timingBar.appendChild(tcell);
       timeCells.push(tcell);
     }
@@ -189,30 +186,30 @@ toc: true
     // Build piano keyboard and grid
     for (let y = 0; y < rows; y++) {
       grid[y] = [];
-      const key = document.createElement('div');
-      key.className = 'key';
+      const key = document.createElement("div");
+      key.className = "key";
       key.textContent = notes[y];
-      key.style.background = notes[y].includes('#') ? '#444' : '#eee';
-      key.style.color = notes[y].includes('#') ? '#fff' : '#000';
-      key.addEventListener('click', async () => {
+      key.style.background = notes[y].includes("#") ? "#444" : "#eee";
+      key.style.color = notes[y].includes("#") ? "#fff" : "#000";
+      key.addEventListener("click", async () => {
         await Tone.start();
-        synth.triggerAttackRelease(notes[y], '8n');
+        synth.triggerAttackRelease(notes[y], "8n");
       });
       piano.appendChild(key);
 
       cellMap[y] = [];
 
       for (let x = 0; x < cols; x++) {
-        const cell = document.createElement('div');
-        cell.className = 'cell';
+        const cell = document.createElement("div");
+        cell.className = "cell";
         cell.dataset.x = x;
         cell.dataset.y = y;
         if (y % 12 === 11)
           cell.style.borderBottomColor = gridMarkingColor;
         if (x % 4 === 3)
           cell.style.borderRightColor = gridMarkingColor;
-        cell.addEventListener('mousedown', (e) => handleCellAction(e, cell));
-        cell.addEventListener('mouseenter', (e) => {
+        cell.addEventListener("mousedown", (e) => handleCellAction(e, cell));
+        cell.addEventListener("mouseenter", (e) => {
           if (mouseDown) handleCellAction(e, cell);
         });
         pianoRoll.appendChild(cell);
@@ -224,12 +221,12 @@ toc: true
     let mouseDown = false;
     let mouseButton = 0;
 
-    document.addEventListener('mousedown', (e) => {
+    document.addEventListener("mousedown", (e) => {
       mouseDown = true;
       mouseButton = e.button; // 0 = left, 2 = right
     });
 
-    document.addEventListener('mouseup', () => {
+    document.addEventListener("mouseup", () => {
       mouseDown = false;
     });
 
@@ -238,33 +235,33 @@ toc: true
       const x = cell.dataset.x;
       const y = cell.dataset.y;
       if (mouseButton === 2) {
-        cell.classList.remove('active');
+        cell.classList.remove("active");
         grid[y][x] = false;
       } else if (mouseButton === 0) {
-        cell.classList.add('active');
+        cell.classList.add("active");
         grid[y][x] = true;
       }
     }
 
 
-    pianoRoll.addEventListener('contextmenu', e => e.preventDefault());
+    pianoRoll.addEventListener("contextmenu", e => e.preventDefault());
 
     let synth = new Tone.PolySynth().toDestination();
     let step = 0, scheduledEvent = null;
 
     function clearIndicators() {
-      document.querySelectorAll('.cell').forEach(c => c.classList.remove('playing'));
-      timeCells.forEach(c => c.classList.remove('current-step'));
+      document.querySelectorAll(".cell").forEach(c => c.classList.remove("playing"));
+      timeCells.forEach(c => c.classList.remove("current-step"));
     }
 
-    document.getElementById('play').addEventListener('click', async () => {
+    document.getElementById("play").addEventListener("click", async () => {
       await Tone.start();
-      Tone.Transport.bpm.value = parseInt(document.getElementById('bpm').value);
+      Tone.Transport.bpm.value = parseInt(document.getElementById("bpm").value);
       step = 0;
       if (scheduledEvent) Tone.Transport.clear(scheduledEvent);
 
-      const instrument = document.getElementById('instrument').value;
-      synth = instrument === 'piano'
+      const instrument = document.getElementById("instrument").value;
+      synth = instrument === "piano"
         ? new Tone.Sampler({ urls: { C4: "C4.mp3" }, baseUrl: "https://tonejs.github.io/audio/salamander/" }).toDestination()
         : new Tone.PolySynth().toDestination();
 
@@ -273,19 +270,19 @@ toc: true
       scheduledEvent = Tone.Transport.scheduleRepeat((time) => {
 
         if (lastStep !== null) {
-          timeCells[lastStep].classList.remove('current-step');
+          timeCells[lastStep].classList.remove("current-step");
           for (let y = 0; y < rows; y++) {
             const cell = cellMap[y][lastStep];
-            cell.classList.remove('playing');
+            cell.classList.remove("playing");
           }
         }
 
-        timeCells[step].classList.add('current-step');
+        timeCells[step].classList.add("current-step");
         for (let y = 0; y < rows; y++) {
           const cell = cellMap[y][step];
           if (grid[y][step]) {
-            synth.triggerAttackRelease(notes[y], '8n', time);
-            cell.classList.add('playing');
+            synth.triggerAttackRelease(notes[y], "8n", time);
+            cell.classList.add("playing");
           }
         }
         lastStep = step;
@@ -296,67 +293,64 @@ toc: true
       Tone.Transport.start();
     });
 
-    document.getElementById('stop').addEventListener('click', () => {
+    document.getElementById("stop").addEventListener("click", () => {
       Tone.Transport.stop();
       Tone.Transport.cancel();
       clearIndicators();
     });
 
-    document.getElementById('clear').addEventListener('click', () => {
+    document.getElementById("clear").addEventListener("click", () => {
       for (let y = 0; y < rows; y++) {
         for (let x = 0; x < cols; x++) {
           grid[y][x] = false;
           const cell = document.querySelector(`.cell[data-x="${x}"][data-y="${y}"]`);
-          cell.classList.remove('active');
+          cell.classList.remove("active");
         }
       }
     });
 
-    document.getElementById('bpm').addEventListener('change', (e) => {
+    document.getElementById("bpm").addEventListener("change", (e) => {
       Tone.Transport.bpm.value = parseInt(e.target.value);
     });
 
-    document.getElementById('save').addEventListener('click', () => {
-      localStorage.setItem('pianoPattern', JSON.stringify(grid));
-      alert('Pattern saved!');
+    document.getElementById("save").addEventListener("click", () => {
+      localStorage.setItem("pianoPattern", JSON.stringify(grid));
+      alert("Pattern saved!");
     });
 
-    document.getElementById('load').addEventListener('click', () => {
-      const saved = JSON.parse(localStorage.getItem('pianoPattern'));
+    document.getElementById("load").addEventListener("click", () => {
+      const saved = JSON.parse(localStorage.getItem("pianoPattern"));
       if (saved) {
         for (let y = 0; y < rows; y++) {
           for (let x = 0; x < cols; x++) {
             grid[y][x] = saved[y][x];
             const cell = document.querySelector(`.cell[data-x="${x}"][data-y="${y}"]`);
-            cell.classList.toggle('active', grid[y][x]);
+            cell.classList.toggle("active", grid[y][x]);
           }
         }
-        alert('Pattern loaded!');
+        alert("Pattern loaded!");
       }
     });
 
-    document.getElementById('export').addEventListener('click', () => {
+    document.getElementById("export").addEventListener("click", () => {
       const track = new MidiWriter.Track();
       track.addEvent(new MidiWriter.ProgramChangeEvent({ instrument: 1 }));
       for (let x = 0; x < cols; x++) {
         for (let y = 0; y < rows; y++) {
           if (grid[y][x]) {
-            track.addEvent(new MidiWriter.NoteEvent({ pitch: [notes[y]], duration: '8' }));
+            track.addEvent(new MidiWriter.NoteEvent({ pitch: [notes[y]], duration: "8" }));
           }
         }
       }
       const write = new MidiWriter.Writer([track]);
       const blob = new Blob([write.buildFile()], { type: "audio/midi" });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = 'pattern.mid';
+      const a = document.createElement("a");
+      a.href = url; a.download = "pattern.mid";
       a.click();
     });
   </script>
 
 </body>
 
-</html>
-  `;
-  document.getElementById('myFrame').srcdoc = htmlContent;
-</script>
+</html>'></iframe>
