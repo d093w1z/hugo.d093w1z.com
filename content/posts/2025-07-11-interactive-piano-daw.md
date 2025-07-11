@@ -6,7 +6,7 @@ publishDate: 2025-07-11T00:00:00.000Z
 description: A light-weight standalone DAW implementation for Piano.
 tags:
   - piano
-  - syntesis
+  - synthesis
   - daw
   - audio
   - music
