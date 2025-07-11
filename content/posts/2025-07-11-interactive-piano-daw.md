@@ -1,21 +1,21 @@
 ---
-title: Interactive Piano
 author: d093w1z
-date: 2025-06-18T18:11:15.000Z
-lastmod: 2025-06-18T18:11:15.000Z
-description: null
+title: Interactive Piano DAW
+date: 2025-07-11T15:51:10.000Z
+publishDate: 2025-07-11T00:00:00.000Z
+description: A light-weight standalone DAW implementation for Piano.
 tags:
-  - usb-c
-  - usb
-  - power
-categories:
-  - hardware
-  - technology
-  - device
-slug: piano
+  - piano
+  - syntesis
+  - daw
+  - audio
+  - music
+categories: []
+slug: interactive-piano-daw
 draft: false
 toc: true
 ---
+# Interactive Piano DAW
 
 <iframe id="myFrame" width="100%" height="900px" srcdoc='&lt;!DOCTYPE html&gt;
 &lt;html lang=&quot;en&quot;&gt;
@@ -357,3 +357,4 @@ toc: true
 &lt;/body&gt;
 
 &lt;/html&gt;'></iframe>
+
