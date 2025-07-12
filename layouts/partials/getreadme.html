@@ -1,0 +1,7 @@
+{{- $repo := .Params.repo -}}
+{{- $branch := or .Params.branch "main" -}}
+{{- $username := or .Params.username -}}
+{{- $url := printf "https://raw.githubusercontent.com/%s/%s/%s/README.md" $username $repo $branch -}}
+{{- with resources.GetRemote $url }}
+{{ .Content | markdownify }}
+{{- end }}

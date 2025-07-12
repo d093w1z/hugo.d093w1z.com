@@ -1,0 +1,19 @@
+<li>
+  <span class="date">{{ .Date | time.Format (.Site.Params.dateFormat | default "January 2, 2006" ) }}</span>
+  
+  <span class="title">
+
+    {{ if .Params.repo }}
+    <span class="github-repo-button">
+      {{- $repo := .Params.repo -}}
+      {{- $username := or .Params.username -}}
+      {{- $repo_url := printf "https://github.com/%s/%s/" $username $repo -}}
+      <a href="{{$repo_url}}" target="_blank" rel="noopener noreferrer">
+        <i class="fa-brands fa-github" aria-hidden="true"></i>
+      </a>
+      &nbsp;&nbsp;&nbsp;&nbsp;
+    </span>
+    {{ end }}
+    <a class="title" href="{{ .Params.externalLink | default .RelPermalink }}">{{ .Title }}</a>
+  </span>
+</li>

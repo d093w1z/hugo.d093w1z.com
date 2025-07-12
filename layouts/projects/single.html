@@ -1,0 +1,65 @@
+{{ define "title" }}
+{{ .Title }} · {{ .Site.Title }}
+{{ end }}
+{{ define "content" }}
+<section class="container post">
+  <article>
+    <header>
+      <div class="project-title">
+        <h1 class="title">
+          <a class="title-link" href="{{ .Permalink | safeURL }}">
+            {{ .Title }}
+          </a>
+        </h1>
+      </div>
+      <div class="post-meta">
+        <div class="date">
+          <span class="posted-on">
+            <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+            <time datetime="{{ .Date.Format " 2006-01-02T15:04:05Z07:00" }}">
+              {{ .Date | time.Format (.Site.Params.dateFormat | default "January 2, 2006" ) }}
+            </time>
+          </span>
+
+          {{ if .Params.repo }}
+          <span class="github-repo">
+            {{- $repo := .Params.repo -}}
+            {{- $username := or .Params.username .Site.Params.github_username -}}
+            {{- $repo_url := printf "https://github.com/%s/%s/" $username $repo -}}
+            <a href="{{$repo_url}}" target="_blank" rel="noopener noreferrer">
+              <i class="fa-brands fa-github" aria-hidden="true"></i> Github Repository
+            </a>
+          </span>
+          {{ end }}
+        </div>
+      </div>
+    </header>
+
+    <div class="project-content">
+      {{ if .Params.featuredImage }}
+      <img src="{{ .Params.featuredImage | relURL }}" alt="Featured image" />
+      {{ end }}
+      {{ .Content }}
+
+      {{ if .Params.repo }}
+      <div class="repo-card">
+        {{- $repo := .Params.repo -}}
+        {{- $username := or .Params.username .Site.Params.github_username -}}
+        <a href="https://github.com/anuraghazra/github-readme-stats" target="_blank" rel="noopener noreferrer">
+          <img
+            src="https://github-readme-stats.vercel.app/api/pin/?username={{$username}}&repo={{$repo}}&theme=transparent"
+            alt="">
+        </a>
+      </div>
+
+      <div class="github-readme">
+        <div class="github-readme-content" style="border: 1px ;border-radius: 1rem;">
+          {{ partial "getreadme.html" . }}
+        </div>
+      </div>
+      {{ end }}
+    </div>
+
+  </article>
+</section>
+{{ end }}
