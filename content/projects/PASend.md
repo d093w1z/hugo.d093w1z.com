@@ -1,0 +1,11 @@
+---
+title: PASend
+date: 2025-06-12T18:30:00.000Z
+description: Stream your Linux audio to Android over TCP using PulseAudio and C++.
+username: d093w1z
+repo: pasend
+branch: master
+draft: false
+author: d093w1z
+---
+
