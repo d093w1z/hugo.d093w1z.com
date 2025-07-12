@@ -9,7 +9,7 @@ categories: null
 slug: polybar-now-playing
 username: d093w1z
 repo: polybar-now-playing
-branch: main
+branch: master
 draft: false
 author: d093w1z
 ---
