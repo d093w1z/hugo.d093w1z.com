@@ -1,11 +1,11 @@
 ---
 title: Polybar Now Playing
-date: 2025-07-12T19:48:53.000Z
+date: 2021-05-16T00:00:00.000Z
 tags:
   - linux
   - tool
   - ricing
-categories: []
+categories: null
 slug: polybar-now-playing
 username: d093w1z
 repo: polybar-now-playing
