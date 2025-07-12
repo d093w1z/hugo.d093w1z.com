@@ -45,7 +45,8 @@
       <div class="repo-card">
         {{- $repo := .Params.repo -}}
         {{- $username := or .Params.username .Site.Params.github_username -}}
-        <a href="https://github.com/anuraghazra/github-readme-stats" target="_blank" rel="noopener noreferrer">
+        {{- $repo_url := printf "https://github.com/%s/%s/" $username $repo -}}
+        <a href="{{$repo_url}}" target="_blank" rel="noopener noreferrer">
           <img
             src="https://github-readme-stats.vercel.app/api/pin/?username={{$username}}&repo={{$repo}}&theme=transparent"
             alt="">
