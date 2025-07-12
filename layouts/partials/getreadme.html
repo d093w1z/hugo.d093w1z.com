@@ -1,7 +1,18 @@
 {{- $repo := .Params.repo -}}
 {{- $branch := or .Params.branch "main" -}}
 {{- $username := or .Params.username -}}
+
+{{- $baseUrl := printf "https://raw.githubusercontent.com/%s/%s/%s/" $username $repo $branch -}}
+{{- $webUrl := printf "https://github.com/%s/%s/blob/%s/" $username $repo $branch -}}
+
 {{- $url := printf "https://raw.githubusercontent.com/%s/%s/%s/README.md" $username $repo $branch -}}
+
 {{- with resources.GetRemote $url }}
-{{ .Content | markdownify }}
+{{- $content := .Content -}}
+
+{{/* Replace image paths (typical: ![alt](docs/img.png)) */}}
+{{ $content = replaceRE `(\!\[[^\]]*\]\()([^h][^\)]*)(\))` (printf "${1}%s${2}${3}" $baseUrl) $content }}
+{{/* Replace normal links ([text](file.md)) to GitHub web URLs */}}
+{{ $content = replaceRE `(\[[^\]]*\]\()([^h][^\)]*)(\))` (printf "${1}%s${2}${3}" $webUrl) $content }}
+{{- $content | markdownify -}}
 {{- end }}
