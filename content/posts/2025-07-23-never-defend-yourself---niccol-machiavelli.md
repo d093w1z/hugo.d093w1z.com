@@ -5,15 +5,15 @@ date: 2025-07-23T14:38:38.000Z
 publishDate: 2025-07-23T00:00:00.000Z
 description: null
 tags:
-  - Realism-in-Politics
+  - realism-in-politics
   - power-dynamics
   - strategic-silence
+  - politics
+  - human-nature
 categories:
   - philosophy
   - power
-  - politics
   - leadership
-  - human-nature
   - strategy
 slug: never-defend-yourself---niccol-machiavelli
 draft: false
