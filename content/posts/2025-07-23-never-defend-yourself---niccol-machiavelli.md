@@ -128,3 +128,5 @@ Choose one real or hypothetical criticism you've faced recently. Draft three pos
 
 >“The lion cannot protect himself from traps, and the fox cannot defend himself from wolves. One must therefore be a fox to recognize traps, and a lion to frighten wolves.”  
 ― Niccolò Machiavelli, The Prince
+
+> When human emotions and psychology are added to a power play, it no longer remains a game of ping pong, rather it becomes Chess. 
