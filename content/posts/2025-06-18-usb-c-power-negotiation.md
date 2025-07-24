@@ -20,7 +20,7 @@ toc: true
 
 ---
 
-## 1. 🔌 Power Role Determination (CC Line)
+## 1.  Power Role Determination (CC Line)
 
 USB‑C uses two Configuration Channel (CC) pins to negotiate roles:
 
@@ -32,14 +32,14 @@ Dual‑Role devices (DRP) randomly pick Rp or Rd during attach, then can swap ro
 
 ---
 
-## 2. ⚡ Establishing Standard Power (≤15 W)
+## 2.  Establishing Standard Power (≤15 W)
 
 - Initial VBUS is set to 5 V after role detection.
 - Passive current advertisement (via CC resistor) allows up to 1.5 A or 3.0 A at 5 V (7.5–15 W)
 
 ---
 
-## 3. 📘 USB Power Delivery (PD) Negotiation
+## 3.  USB Power Delivery (PD) Negotiation
 
 To exceed 15 W (i.e., up to 100 W), the **PD protocol** kicks in over CC:
 
@@ -53,7 +53,7 @@ Negotiated ranges: 5–20 V up to 5 A (100 W). Newer Extended Power Range 
 
 ---
 
-## 4. 🔄 Data Role & Alternate Mode Negotiation
+## 4.  Data Role & Alternate Mode Negotiation
 
 USB‑C also supports data role switching and Alternate Modes:
 
@@ -65,16 +65,16 @@ Wide reuse of CC for power, data, and orientation detection.
 
 ---
 
-## 5. 🛠️ Why Crossing USB‑C Is (Usually) Safe
+## 5.  Why Crossing USB‑C Is (Usually) Safe
 
 - **Standardized roles & limits**: Devices won't exceed safe default scenarios.
-- **PD negotiation** ensures voltage/current are mutually agreed before ramping VBUS :contentReference[oaicite:8]{index=8}.
-- **Safe to plug mismatched USB‑C**: If the other end can't supply/accept power, VBUS stays off or remains at safe 0 V/5 V :contentReference[oaicite:9]{index=9}.
-- **Data security**: “Juice jacking” (malicious/data-stealing via public USB ports) is a remote theoretic risk – mitigated by modern OS prompts or using charge-only cables/adapters :contentReference[oaicite:10]{index=10}.
+- **PD negotiation** ensures voltage/current are mutually agreed before ramping VBUS.
+- **Safe to plug mismatched USB‑C**: If the other end can't supply/accept power, VBUS stays off or remains at safe 0 V/5 V.
+- **Data security**: “Juice jacking” (malicious/data-stealing via public USB ports) is a remote theoretic risk – mitigated by modern OS prompts or using charge-only cables/adapters.
 
 ---
 
-## 6. ⚠️ Why It Can Be Unsafe
+## 6.  Why It Can Be Unsafe
 
 1. **Poor-quality cables**:
    - Non-compliant resistor values (e.g., 10 kΩ instead of 56 kΩ)
