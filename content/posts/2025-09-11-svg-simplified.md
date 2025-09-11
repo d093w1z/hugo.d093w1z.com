@@ -35,39 +35,14 @@ The svg can also be modified on the fly, using css or javascript. This makes ani
   Sorry, your browser does not support inline SVG.
 </svg>
 ```
-
+Output:
 <svg height="100" width="100">
   <circle r="45" cx="50" cy="50" fill="hotpink" />
   Sorry, your browser does not support inline SVG.  
 </svg>
 
-
-<div style="display: flex; gap: 16px; border: 2px solid #333; padding: 10px; border-radius: 8px; align-items: flex-start;">
-
-<div style="flex: 1;">
-<pre>
-<code >
-```xml
-<svg height="100" width="100">
-  <circle r="45" cx="50" cy="50" fill="hotpink" />
-  Sorry, your browser does not support inline SVG.
-</svg>
-```
-</code>
-</pre>
-</div> <div style="flex: 1; text-align: center;"> <svg height="100" width="100"> <circle r="45" cx="50" cy="50" fill="hotpink" /> Sorry, your browser does not support inline SVG. </svg> </div> </div>
-
-<div style="display: flex; gap: 16px; border: 2px solid #333; padding: 10px; border-radius: 8px; align-items: flex-start;">
-
-<div style="flex: 1;">
-```xml
-<svg height="100" width="100">
-  <circle r="45" cx="50" cy="50" fill="hotpink" />
-  Sorry, your browser does not support inline SVG.
-</svg>
-```
-</div> <div style="flex: 1; text-align: center;"> <svg height="100" width="100"> <circle r="45" cx="50" cy="50" fill="hotpink" /> Sorry, your browser does not support inline SVG. </svg> </div> </div>
-
+| ```xml<br><svg height="100" width="100"><br>  <circle r="45" cx="50" cy="50" fill="hotpink" /><br>  Sorry, your browser does not support inline SVG.<br></svg><br>``` | <svg height="100" width="100"> <circle r="45" cx="50" cy="50" fill="hotpink" /> Sorry, your browser does not support inline SVG. </svg> |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
 
 svgs can be created by hand using any text editor.
-can also be created with 
+can also be created with professional graphics software. best option ive worked with is inkscape.
