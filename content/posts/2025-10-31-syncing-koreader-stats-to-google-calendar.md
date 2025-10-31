@@ -166,7 +166,7 @@ The patterns that emerged were surprisingly telling — the quiet pockets of tim
 
 ## Reflection
 
-![[Pasted image 20251031225027.png]]
+![Pasted image 20251031225027](../../../../Assets/Files/Pasted%20image%2020251031225027.png)
 This entire automation started as a small curiosity — a way to surface data I already had. But it became something else: a lightweight reflection tool.
 There’s a quiet satisfaction in opening Google Calendar and seeing my reading woven between everything else I do.
 
