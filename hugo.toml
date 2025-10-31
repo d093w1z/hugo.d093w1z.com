@@ -245,3 +245,4 @@ url = "contact/"
 
 
 sitemap = true
+disablePathToLower = true
