@@ -3,4 +3,4 @@ This favicon was generated using the following font:
 - Font Title: Rokkitt
 - Font Author: undefined
 - Font Source: https://fonts.gstatic.com/s/rokkitt/v36/qFdb35qfgYFjGy5hukqqhw5XeRgdi1rAd5DLE76HvN6n.ttf
-- Font License: undefined)
+- Font License: undefined
