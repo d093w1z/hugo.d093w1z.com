@@ -19,6 +19,8 @@ toc: true
 ---
 # Syncing KOReader Stats to Google Calendar
 
+
+
 For a long time, my Kobo and KOReader setup quietly gathered data — timestamps, durations, page counts — all buried in a small SQLite file inside *KoReader settings folder*. It was good data, but inert. I wanted it to *mean* something — to tell me *when* I read, not just *how much*.  
 
 So I started building a small workflow around it.
@@ -73,16 +75,15 @@ The output was a neat JSON list — one entry per page turn. That data flowed in
 It worked. But it was naive.
 
 KOReader logs every page turn as an entry, so a single reading session could easily spawn ten events in my calendar. The result was chaos — a timeline that looked like someone was flicking through books every few seconds.
-Rethinking What a "Session" Is
+
+## Rethinking What a "Session" Is
 
 The next step was to define sessions. Humans read continuously; the data doesn’t reflect that directly, but it can be inferred.
 
 The rule I ended up with was simple:
 
-```
-If consecutive entries for the same book are less than 10 minutes apart,
-they belong to the same session.
-```
+    If consecutive entries for the same book are less than 10 minutes apart,
+    they belong to the same session.
 
 That grouping cleaned up everything.
 A function node in [n8n](https://n8n.io) handled the logic:
@@ -141,7 +142,8 @@ return sessions.map(s => {
 ```
 
 The node outputs one clean JSON object per session, merging all the small fragments into a continuous event.
-Preventing Duplicates
+
+## Preventing Duplicates
 
 Once aggregation worked, another problem surfaced — duplication.
 Every 15 minutes, [n8n](https://n8n.io) would re-run and create identical events again.
@@ -150,14 +152,11 @@ The fix was to add a small lookup before creating events. The Google Calendar AP
 
 So the workflow changed:
 
-
-```txt
-Query SQLite → Aggregate sessions
-For each session:
-    Check if an event with the same uid exists
-    If yes → Update
-    If no → Create
-```
+    Query SQLite → Aggregate sessions
+    For each session:
+        Check if an event with the same uid exists
+        If yes → Update
+        If no → Create
 
 That small check turned the workflow from a fire-hose into a proper sync system.
 
