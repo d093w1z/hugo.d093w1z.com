@@ -27,7 +27,7 @@ So I started building a small workflow around it.
 
 ## Setting the Stage
 
-Everything runs inside my Proxmox setup — a few LXCs doing specific jobs. One of them runs **Syncthing**, syncing my KOReader configuration folder from the Kobo. Another runs **n8n**, the automation platform that quietly keeps things stitched together.
+Everything runs inside my Proxmox setup — a few LXCs doing specific jobs. One of them runs **[Syncthing](https://syncthing.net/)**, syncing my KOReader configuration folder from the Kobo. Another runs **[n8n](https://n8n.io)**, the automation platform that quietly keeps things stitched together.
 
 The idea was simple:  
 - Extract reading session data from KOReader’s SQLite database.  
@@ -38,8 +38,22 @@ The idea was simple:
 
 ## The First Version
 
-The first pass was straightforward: a cron trigger in n8n every 15 minutes, an SSH node to sync the latest data, and a command node running a small SQLite query:
+The first pass was straightforward: a cron trigger in n8n every 1 Hour, an SSH node to sync the latest data, and a command node running a small SQLite query:
 
+Query:
+```sql
+SELECT 
+  b.title, 
+  p.page, 
+  datetime(p.start_time, 'unixepoch') AS start_time, 
+  p.duration
+FROM page_stat_data p
+JOIN book b ON b.id = p.id_book
+WHERE p.start_time > strftime('%s', 'now', '-1 day')
+ORDER BY p.start_time DESC;
+```
+
+Execute Node Command with query:
 ```bash
 sqlite3 -json "/mnt/koreader/KoReader settings folder/statistics.sqlite3" "
 SELECT 
@@ -54,7 +68,6 @@ ORDER BY p.start_time DESC;
 "
 ```
 
-
 The output was a neat JSON list — one entry per page turn. That data flowed into Google Calendar, creating events with start and end times based on the duration field.
 
 It worked. But it was naive.
@@ -66,10 +79,13 @@ The next step was to define sessions. Humans read continuously; the data doesn�
 
 The rule I ended up with was simple:
 
-    If consecutive entries for the same book are less than 10 minutes apart, they belong to the same session.
+```
+If consecutive entries for the same book are less than 10 minutes apart,
+they belong to the same session.
+```
 
 That grouping cleaned up everything.
-A function node in n8n handled the logic:
+A function node in [n8n](https://n8n.io) handled the logic:
 
 ```js
 
@@ -134,11 +150,14 @@ The fix was to add a small lookup before creating events. The Google Calendar AP
 
 So the workflow changed:
 
-    Query SQLite → Aggregate sessions
-    For each session:
-        Check if an event with the same uid exists
-        If yes → Update
-        If no → Create
+
+```txt
+Query SQLite → Aggregate sessions
+For each session:
+    Check if an event with the same uid exists
+    If yes → Update
+    If no → Create
+```
 
 That small check turned the workflow from a fire-hose into a proper sync system.
 
