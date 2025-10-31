@@ -19,8 +19,6 @@ toc: true
 ---
 # Syncing KOReader Stats to Google Calendar
 
-
-
 For a long time, my Kobo and KOReader setup quietly gathered data — timestamps, durations, page counts — all buried in a small SQLite file inside *KoReader settings folder*. It was good data, but inert. I wanted it to *mean* something — to tell me *when* I read, not just *how much*.  
 
 So I started building a small workflow around it.
