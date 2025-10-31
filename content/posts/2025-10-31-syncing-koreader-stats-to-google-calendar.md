@@ -12,6 +12,7 @@ tags:
   - selfhosted
   - n8n
   - kobo
+  - koreader
 categories: []
 slug: syncing-koreader-stats-to-google-calendar
 draft: false
