@@ -1,12 +1,11 @@
 ---
 author: d093w1z
-title: 'How I Automated Blog Publishing & My Projects Page With Hugo, n8n & Obsidian'
+title: 'Automating Blog Publishing With Hugo, n8n & Obsidian'
 date: 2025-11-26T11:42:14.000Z
 publishDate: 2025-11-26T00:00:00.000Z
 description: >-
   A fully automated workflow that takes a markdown file from Obsidian and turns
-  it into a published blog post and updates a projects page - without me
-  touching Git.
+  it into a published blog post - without me touching Git.
 tags:
   - hugo
   - automation
@@ -15,12 +14,12 @@ tags:
   - github
   - self-hosted
 categories: []
-slug: how-i-automated-blog-publishing-my-projects-page-with-hugo-n8n-obsidian
+slug: automating-blog-publishing-with-hugo-n8n-obsidian
 draft: false
 toc: true
 ---
-# How I Automated Blog Publishing & My Projects Page With Hugo, n8n & Obsidian
 
+# How I Automated Blog Publishing With Hugo, n8n & Obsidian
 
 ## Introduction
 
