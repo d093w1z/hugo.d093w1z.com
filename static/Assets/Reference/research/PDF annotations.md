@@ -9,7 +9,7 @@ annotation-target: 10.1109@EDGE.2019.00035.pdf
 >```
 >%%
 >*%%PREFIX%%nces, and hardware requirements.%%HIGHLIGHT%% ==There is no universally accepted definition of these twoparadigms, but several scattered descriptions, sometimesoverlapping among each other.== %%POSTFIX%%This ambiguity is probablydue to*
->%%LINK%%[[#^dqvw9m6idy9|show annotation]]
+>%%LINK%%[show annotation](#^dqvw9m6idy9)
 >%%COMMENT%%
 >
 >%%TAGS%%
@@ -23,7 +23,7 @@ annotation-target: 10.1109@EDGE.2019.00035.pdf
 >```
 >%%
 >*%%PREFIX%%chitectures share the same goal:%%HIGHLIGHT%% ==bringing the computation closer to the source of the data== %%POSTFIX%%.Indeed, the low latency perform*
->%%LINK%%[[#^5qi267sdd4d|show annotation]]
+>%%LINK%%[show annotation](#^5qi267sdd4d)
 >%%COMMENT%%
 >
 >%%TAGS%%

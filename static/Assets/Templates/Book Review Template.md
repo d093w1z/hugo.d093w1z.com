@@ -59,7 +59,7 @@ tags:
 - 💡 Small habit I’ll start:
 - 🛠️ System/process I’ll tweak:
 - 🧪 Something I want to test out:
-- ⏳ Revisit this book in: `[[Reading Revisit Tracker]]`
+- ⏳ Revisit this book in: `[Reading Revisit Tracker](Reading%20Revisit%20Tracker)`
 
 ---
 

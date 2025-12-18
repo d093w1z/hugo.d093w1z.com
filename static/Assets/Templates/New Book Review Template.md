@@ -103,4 +103,4 @@ Use bullet points or headings to organize by chapters or concepts.
 
 # 📂 Related Links
 
-- [[Reading List]]
+- [Reading List](Reading%20List)
