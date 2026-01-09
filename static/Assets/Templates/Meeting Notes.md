@@ -2,11 +2,11 @@
 const date = tp.date.now("YYYY-MM-DDTHH:mm:ssZ")
 const time = tp.date.now("HH:mm");
 const weekday = tp.date.now("dddd");
-// const title = await tp.system.prompt("Meeting Title", null, false, false);
-let title = await tp.system.suggester(["test", "Sad", "Confused"], ["Happy", "Sad", "Confused"]);
+
+let title = await tp.system.suggester(["Composer weekly review", "Project Weekly Review", "Other"], ["Composer weekly review", "Project Weekly Review", "Other"]);
 
 if(title===null){
-    title = await tp.system.prompt("Meeting Title", null, false, false);
+    title = await tp.system.prompt("Meeting Title");
 }
 const slug = title
   .toLowerCase()
