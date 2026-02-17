@@ -32,10 +32,10 @@ author: d093w1z
 
 - **Project / Team:**  
 - **Attendees:**     
-  - [ ] Omkar Kulkarni
-  - [ ] Shubham Kapote
-  - [ ] Bhushan Modak
-  - [ ] d093w1z
+  - [ ] [[omkar-kulkarni]]
+  - [ ] [[shubham-kapote]]
+  - [ ] [[bhushan-modak]]
+  - [ ] [[mukesh-tandale-me]]
 
 - **Meeting Type:** (Stand-up / Sprint Planning / Retrospective / Technical Discussion / 1:1 / Stakeholder)
 
