@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>WFC Portfolio Demo</title>
+<style>
+  body {
+    background:#0b0b0b;
+    color:#eee;
+    font-family: system-ui;
+    text-align:center;
+  }
+
+  canvas {
+    border:1px solid #333;
+    margin-top:10px;
+  }
+
+  button,input {
+    margin:6px;
+    padding:8px 12px;
+    background:#1a1a1a;
+    color:#fff;
+    border:1px solid #444;
+    cursor:pointer;
+  }
+
+  .panel {
+    margin-top:10px;
+  }
+
+  #info {
+    margin-top:10px;
+    font-size:14px;
+    color:#aaa;
+  }
+</style>
+</head>
+<body>
+
+<h2>Wave Function Collapse – Interactive System</h2>
+
+<div class="panel">
+  <button onclick="step()">Step</button>
+  <button onclick="run()">Run</button>
+  <button onclick="pause()">Pause</button>
+  <button onclick="reset()">Reset</button>
+  <label>
+    Speed <input type="range" id="speed" min="10" max="200" value="40">
+  </label>
+  <label>
+    <input type="checkbox" id="heatmap" checked> Entropy Heatmap
+  </label>
+</div>
+
+<canvas id="grid" width="600" height="600"></canvas>
+
+<div id="info">Click any cell to inspect its constraints</div>
+
+<script>
+// ---------- AUDIO ----------
+const ctxAudio = new (window.AudioContext || window.webkitAudioContext)();
+
+function beep(freq, duration=0.05){
+  const osc = ctxAudio.createOscillator();
+  const gain = ctxAudio.createGain();
+
+  osc.frequency.value = freq;
+  osc.type = "sine";
+
+  osc.connect(gain);
+  gain.connect(ctxAudio.destination);
+
+  osc.start();
+  gain.gain.setValueAtTime(0.1, ctxAudio.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctxAudio.currentTime + duration);
+
+  osc.stop(ctxAudio.currentTime + duration);
+}
+
+// ---------- CONFIG ----------
+const N = 30;
+const CELL = 20;
+
+// Tiles: road system
+// edges: [top, right, bottom, left]
+const tiles = [
+  {id:0, color:"#111", edges:[0,0,0,0]}, // empty
+  {id:1, color:"#4caf50", edges:[1,1,1,1]}, // cross
+  {id:2, color:"#2196f3", edges:[1,0,1,0]}, // vertical
+  {id:3, color:"#ff9800", edges:[0,1,0,1]}, // horizontal
+  {id:4, color:"#e91e63", edges:[1,1,0,0]}, // corner
+];
+
+let grid, interval;
+
+// ---------- INIT ----------
+function init(){
+  grid=[];
+  for(let y=0;y<N;y++){
+    let row=[];
+    for(let x=0;x<N;x++){
+      row.push({
+        options: tiles.map(t=>t.id),
+        collapsed:false
+      });
+    }
+    grid.push(row);
+  }
+}
+
+// ---------- CORE ----------
+function entropy(c){ return c.options.length; }
+
+function pickCell(){
+  let min=999, list=[];
+  for(let y=0;y<N;y++){
+    for(let x=0;x<N;x++){
+      let c=grid[y][x];
+      if(!c.collapsed){
+        let e=entropy(c);
+        if(e<min){ min=e; list=[{x,y}]; }
+        else if(e===min) list.push({x,y});
+      }
+    }
+  }
+  return list.length ? list[Math.floor(Math.random()*list.length)] : null;
+}
+
+function collapse(x,y){
+  let c=grid[y][x];
+  if(c.options.length===0) return false;
+
+  let pick=c.options[Math.floor(Math.random()*c.options.length)];
+  c.options=[pick];
+  c.collapsed=true;
+
+  beep(600); // sound
+  return true;
+}
+
+function valid(a,b,dir){
+  return tiles[a].edges[dir] === tiles[b].edges[(dir+2)%4];
+}
+
+function neighbors(x,y){
+  return [
+    {x,y:y-1,dir:0},
+    {x:x+1,y,dir:1},
+    {x,y:y+1,dir:2},
+    {x:x-1,y,dir:3}
+  ].filter(n=>n.x>=0&&n.y>=0&&n.x<N&&n.y<N);
+}
+
+function propagate(){
+  let changed=true;
+
+  while(changed){
+    changed=false;
+
+    for(let y=0;y<N;y++){
+      for(let x=0;x<N;x++){
+        let cell=grid[y][x];
+
+        for(let n of neighbors(x,y)){
+          let nb=grid[n.y][n.x];
+          let newOpts=[];
+
+          for(let opt of nb.options){
+            let ok=false;
+            for(let my of cell.options){
+              if(valid(my,opt,n.dir)){ ok=true; break; }
+            }
+            if(ok) newOpts.push(opt);
+          }
+
+          if(newOpts.length===0){
+            beep(120,0.2); // contradiction sound
+            return false;
+          }
+
+          if(newOpts.length < nb.options.length){
+            nb.options=newOpts;
+            changed=true;
+          }
+        }
+      }
+    }
+  }
+  return true;
+}
+
+// ---------- CONTROL ----------
+function step(){
+  let p=pickCell();
+  if(!p) return;
+
+  if(!collapse(p.x,p.y) || !propagate()){
+    reset();
+    return;
+  }
+  draw();
+}
+
+function run(){
+  pause();
+  let speed=document.getElementById("speed").value;
+
+  interval=setInterval(()=>{
+    let p=pickCell();
+    if(!p){ pause(); return; }
+
+    if(!collapse(p.x,p.y) || !propagate()){
+      reset();
+      return;
+    }
+    draw();
+  }, speed);
+}
+
+function pause(){
+  clearInterval(interval);
+}
+
+function reset(){
+  pause();
+  init();
+  draw();
+}
+
+// ---------- DRAW ----------
+function draw(){
+  let ctx = document.getElementById("grid").getContext("2d");
+  let heat = document.getElementById("heatmap").checked;
+
+  for(let y=0;y<N;y++){
+    for(let x=0;x<N;x++){
+      let c=grid[y][x];
+
+      if(c.collapsed){
+        ctx.fillStyle=tiles[c.options[0]].color;
+      } else if(heat){
+        let v=255 - c.options.length*30;
+        ctx.fillStyle=`rgb(${v},${v},${v})`;
+      } else {
+        ctx.fillStyle="#666";
+      }
+
+      ctx.fillRect(x*CELL,y*CELL,CELL,CELL);
+    }
+  }
+}
+
+// ---------- INSPECT ----------
+document.getElementById("grid").addEventListener("click", e=>{
+  let rect=e.target.getBoundingClientRect();
+  let x=Math.floor((e.clientX-rect.left)/CELL);
+  let y=Math.floor((e.clientY-rect.top)/CELL);
+
+  let cell=grid[y][x];
+  document.getElementById("info").innerText =
+    `Cell (${x},${y}) → options: [${cell.options.join(", ")}]`;
+});
+
+// ---------- START ----------
+init();
+draw();
+</script>
+
+</body>
+</html>
