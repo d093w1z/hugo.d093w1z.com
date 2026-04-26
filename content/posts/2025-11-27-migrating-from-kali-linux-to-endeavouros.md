@@ -21,7 +21,7 @@ toc: true
 
 ## Introduction
 
-I used Kali Linux as my primary OS for about two years.
+I used Kali Linux as my primary OS for about five years.
 
 It worked well for what it’s designed for — fast, minimal, and predictable. But over time, my usage shifted more towards development, longer sessions, and heavier workloads (containers, VMs, GPU work).
 
