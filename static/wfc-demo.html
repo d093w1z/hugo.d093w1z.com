@@ -1,271 +1,710 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<title>WFC Portfolio Demo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wave Function Collapse</title>
 <style>
-  body {
-    background:#0b0b0b;
-    color:#eee;
-    font-family: system-ui;
-    text-align:center;
-  }
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
-  canvas {
-    border:1px solid #333;
-    margin-top:10px;
-  }
+:root{--accent:#7c6aff;--accent2:#ff6a9b;--accent3:#3dd68c;--radius:5px}
+[data-theme="dark"]{--bg:#0d0d14;--surface:#13131e;--border:#23233a;--text:#ddddf0;--muted:#55556e}
+[data-theme="light"]{--bg:#f0f0f8;--surface:#ffffff;--border:#d0d0e8;--text:#1a1a2e;--muted:#8888aa}
 
-  button,input {
-    margin:6px;
-    padding:8px 12px;
-    background:#1a1a1a;
-    color:#fff;
-    border:1px solid #444;
-    cursor:pointer;
-  }
+html,body{font-family:'JetBrains Mono',monospace;background:var(--bg);color:var(--text);font-size:11px;height:100%;overflow:hidden}
+body{display:flex;flex-direction:column;align-items:center;padding:9px 9px 7px;gap:6px}
 
-  .panel {
-    margin-top:10px;
-  }
+#header{width:100%;display:flex;align-items:center;justify-content:space-between}
+#header-left{display:flex;align-items:baseline;gap:7px}
+#title{font-size:11px;font-weight:600;letter-spacing:.1em;color:var(--accent);text-transform:uppercase}
+#subtitle{font-size:9px;color:var(--muted)}
 
-  #info {
-    margin-top:10px;
-    font-size:14px;
-    color:#aaa;
-  }
+#theme-btn{background:none;border:1px solid var(--border);border-radius:var(--radius);color:var(--muted);padding:3px 8px;cursor:pointer;font-size:10px;font-family:'JetBrains Mono',monospace;transition:border-color .15s,color .15s}
+#theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+#ts-row{display:flex;gap:5px;width:100%}
+.ts-btn{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:.05em;border:1px solid var(--border);border-radius:20px;background:transparent;color:var(--muted);padding:3px 8px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.ts-btn:hover{border-color:var(--accent);color:var(--accent)}
+.ts-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+
+#canvas-wrap{position:relative;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;flex-shrink:0;background:var(--surface)}
+canvas{display:block;image-rendering:pixelated}
+
+#overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(255,20,60,0.12);font-size:9px;letter-spacing:.1em;color:#ff4477;pointer-events:none;opacity:0;transition:opacity .15s}
+#overlay.show{opacity:1}
+
+#prog{width:100%;height:2px;background:var(--border);border-radius:1px;overflow:hidden;flex-shrink:0}
+#prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent3));width:0%;border-radius:1px;transition:width .08s}
+
+#stats{display:flex;gap:10px;width:100%;color:var(--muted);font-size:9px;flex-shrink:0}
+.stat{display:flex;gap:3px}
+.val{color:var(--text);font-weight:600}
+.val.bad{color:var(--accent2)}
+
+#controls{width:100%;display:flex;gap:5px;align-items:center;flex-shrink:0}
+button.ctrl{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);padding:5px 10px;cursor:pointer;transition:all .15s;white-space:nowrap}
+button.ctrl:hover{border-color:var(--accent);color:var(--accent)}
+button.ctrl.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+button.ctrl.primary:hover{background:#9580ff;border-color:#9580ff}
+
+.speed-wrap{display:flex;align-items:center;gap:5px;flex:1}
+.speed-wrap label{font-size:9px;color:var(--muted);white-space:nowrap}
+input[type=range]{flex:1;-webkit-appearance:none;height:2px;border-radius:1px;background:var(--border);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:var(--accent);cursor:pointer}
+
+#legend{display:flex;gap:7px;flex-wrap:wrap;width:100%;font-size:8px;color:var(--muted);align-items:center;flex-shrink:0}
+.leg{display:flex;align-items:center;gap:3px}
+.leg-sw{width:8px;height:8px;border-radius:2px;flex-shrink:0}
 </style>
 </head>
 <body>
 
-<h2>Wave Function Collapse – Interactive System</h2>
-
-<div class="panel">
-  <button onclick="step()">Step</button>
-  <button onclick="run()">Run</button>
-  <button onclick="pause()">Pause</button>
-  <button onclick="reset()">Reset</button>
-  <label>
-    Speed <input type="range" id="speed" min="10" max="200" value="40">
-  </label>
-  <label>
-    <input type="checkbox" id="heatmap" checked> Entropy Heatmap
-  </label>
+<div id="header">
+  <div id="header-left">
+    <span id="title">Wave Function Collapse</span>
+    <span id="subtitle">Interactive Demo</span>
+  </div>
+  <button id="theme-btn">☀ Light</button>
 </div>
 
-<canvas id="grid" width="600" height="600"></canvas>
+<div id="ts-row">
+  <button class="ts-btn active" data-ts="dungeon">⚔ Dungeon</button>
+  <button class="ts-btn" data-ts="circuit">⚡ Circuit</button>
+  <button class="ts-btn" data-ts="terrain">🌿 Terrain</button>
+  <button class="ts-btn" data-ts="pipes">🔧 Pipes</button>
+</div>
 
-<div id="info">Click any cell to inspect its constraints</div>
+<div id="canvas-wrap">
+  <canvas id="c"></canvas>
+  <div id="overlay">CONTRADICTION — RESTARTING</div>
+</div>
+
+<div id="prog"><div id="prog-fill"></div></div>
+
+<div id="stats">
+  <div class="stat">DONE <span class="val" id="s-done">0</span></div>
+  <div class="stat">LEFT <span class="val" id="s-left">0</span></div>
+  <div class="stat">⟳ <span class="val bad" id="s-restart">0</span></div>
+  <div class="stat">STEP <span class="val" id="s-step">0</span></div>
+</div>
+
+<div id="controls">
+  <button class="ctrl primary" id="btn-run">▶ Run</button>
+  <button class="ctrl" id="btn-step">+1</button>
+  <button class="ctrl" id="btn-reset">↺</button>
+  <div class="speed-wrap">
+    <label>SPD</label>
+    <input type="range" id="speed" min="1" max="100" value="35">
+  </div>
+</div>
+
+<div id="legend"></div>
 
 <script>
-// ---------- AUDIO ----------
-const ctxAudio = new (window.AudioContext || window.webkitAudioContext)();
+// ════════════════════════════════════════════════════
+//  GRID CONFIG
+// ════════════════════════════════════════════════════
+const GW=24, GH=17, CS=17;
 
-function beep(freq, duration=0.05){
-  const osc = ctxAudio.createOscillator();
-  const gain = ctxAudio.createGain();
+// ════════════════════════════════════════════════════
+//  DRAW HELPERS
+// ════════════════════════════════════════════════════
+const r=(ctx,x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)};
+const circ=(ctx,x,y,rad,c)=>{ctx.beginPath();ctx.arc(x,y,rad,0,Math.PI*2);ctx.fillStyle=c;ctx.fill()};
+const ln=(ctx,x1,y1,x2,y2,c,w=1)=>{ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.strokeStyle=c;ctx.lineWidth=w;ctx.stroke()};
 
-  osc.frequency.value = freq;
-  osc.type = "sine";
+// ════════════════════════════════════════════════════
+//  TILESETS
+//  Each tile: { edges:[N,E,S,W], w:weight, draw(ctx,px,py,cs,dk) }
+//  Sockets: tiles are adjacent only when their touching sockets are compatible
+// ════════════════════════════════════════════════════
 
-  osc.connect(gain);
-  gain.connect(ctxAudio.destination);
+// ── DUNGEON ───────────────────────────────────────
+// Sockets: W=wall, F=floor, D=door
+const DUNGEON = {
+  label:'Dungeon',
+  compat:{ W:['W'], F:['F','D'], D:['D','F'] },
+  legend:[
+    {c:'#2a1e40',l:'Floor'},{c:'#5a4070',l:'Wall'},{c:'#7a5030',l:'Door'},{c:'#ff9933',l:'Torch'},
+  ],
+  tiles:[
+    // 0 — floor
+    {edges:['F','F','F','F'],w:10,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,dk?'#1e1830':'#ede8f5');
+      ctx.fillStyle=dk?'rgba(255,255,255,0.035)':'rgba(0,0,0,0.05)';
+      [[2,2],[7,4],[3,9],[10,7],[5,13],[13,11]].forEach(([dx,dy])=>ctx.fillRect(px+dx,py+dy,2,1));
+    }},
+    // 1 — horizontal wall band (wall N+S, floor E+W)
+    {edges:['W','F','W','F'],w:4,draw(ctx,px,py,cs,dk){
+      const fl=dk?'#1e1830':'#ede8f5', wl=dk?'#4a3562':'#9080b8';
+      r(ctx,px,py,cs,cs,fl);
+      r(ctx,px,py,cs,Math.round(cs*0.36),wl);
+      r(ctx,px,py+Math.round(cs*0.64),cs,cs-Math.round(cs*0.64),wl);
+      // mortar
+      ctx.strokeStyle=dk?'rgba(0,0,0,0.35)':'rgba(255,255,255,0.5)';ctx.lineWidth=0.5;
+      ctx.strokeRect(px,py+Math.round(cs*0.36),cs,Math.round(cs*0.28));
+    }},
+    // 2 — vertical wall band (wall E+W, floor N+S)
+    {edges:['F','W','F','W'],w:4,draw(ctx,px,py,cs,dk){
+      const fl=dk?'#1e1830':'#ede8f5', wl=dk?'#4a3562':'#9080b8';
+      r(ctx,px,py,cs,cs,fl);
+      r(ctx,px,py,Math.round(cs*0.36),cs,wl);
+      r(ctx,px+Math.round(cs*0.64),py,cs-Math.round(cs*0.64),cs,wl);
+      ctx.strokeStyle=dk?'rgba(0,0,0,0.35)':'rgba(255,255,255,0.5)';ctx.lineWidth=0.5;
+      ctx.strokeRect(px+Math.round(cs*0.36),py,Math.round(cs*0.28),cs);
+    }},
+    // 3 — solid wall block (all W)
+    {edges:['W','W','W','W'],w:3,draw(ctx,px,py,cs,dk){
+      const wl=dk?'#4a3562':'#9080b8';
+      r(ctx,px,py,cs,cs,wl);
+      ctx.strokeStyle=dk?'rgba(0,0,0,0.4)':'rgba(255,255,255,0.35)';ctx.lineWidth=0.5;
+      ctx.strokeRect(px,py+cs/2,cs,0);
+      ctx.strokeRect(px+cs/2,py,0,cs/2);
+      ctx.strokeRect(px+cs*0.25,py+cs/2,0,cs/2);
+      ctx.strokeRect(px+cs*0.75,py+cs/2,0,cs/2);
+    }},
+    // 4 — corner NW (wall N+W, floor S+E)
+    {edges:['W','F','F','W'],w:2,draw(ctx,px,py,cs,dk){
+      const fl=dk?'#1e1830':'#ede8f5', wl=dk?'#4a3562':'#9080b8';
+      r(ctx,px,py,cs,cs,fl);
+      r(ctx,px,py,cs,Math.round(cs*0.36),wl);
+      r(ctx,px,py,Math.round(cs*0.36),cs,wl);
+    }},
+    // 5 — corner NE (wall N+E, floor S+W)
+    {edges:['W','W','F','F'],w:2,draw(ctx,px,py,cs,dk){
+      const fl=dk?'#1e1830':'#ede8f5', wl=dk?'#4a3562':'#9080b8';
+      r(ctx,px,py,cs,cs,fl);
+      r(ctx,px,py,cs,Math.round(cs*0.36),wl);
+      r(ctx,px+Math.round(cs*0.64),py,cs-Math.round(cs*0.64),cs,wl);
+    }},
+    // 6 — corner SE (wall S+E, floor N+W)
+    {edges:['F','W','W','F'],w:2,draw(ctx,px,py,cs,dk){
+      const fl=dk?'#1e1830':'#ede8f5', wl=dk?'#4a3562':'#9080b8';
+      r(ctx,px,py,cs,cs,fl);
+      r(ctx,px,py+Math.round(cs*0.64),cs,cs-Math.round(cs*0.64),wl);
+      r(ctx,px+Math.round(cs*0.64),py,cs-Math.round(cs*0.64),cs,wl);
+    }},
+    // 7 — corner SW (wall S+W, floor N+E)
+    {edges:['F','F','W','W'],w:2,draw(ctx,px,py,cs,dk){
+      const fl=dk?'#1e1830':'#ede8f5', wl=dk?'#4a3562':'#9080b8';
+      r(ctx,px,py,cs,cs,fl);
+      r(ctx,px,py+Math.round(cs*0.64),cs,cs-Math.round(cs*0.64),wl);
+      r(ctx,px,py,Math.round(cs*0.36),cs,wl);
+    }},
+    // 8 — door in horizontal wall (D N+S, F E+W)
+    {edges:['D','F','D','F'],w:1.2,draw(ctx,px,py,cs,dk){
+      const fl=dk?'#1e1830':'#ede8f5', wl=dk?'#4a3562':'#9080b8';
+      r(ctx,px,py,cs,cs,fl);
+      r(ctx,px,py,cs,Math.round(cs*0.28),wl);
+      r(ctx,px,py+Math.round(cs*0.72),cs,cs-Math.round(cs*0.72),wl);
+      // door
+      r(ctx,px+Math.round(cs*0.18),py+Math.round(cs*0.28),Math.round(cs*0.64),Math.round(cs*0.44),dk?'#7a5030':'#a06840');
+      r(ctx,px+Math.round(cs*0.22),py+Math.round(cs*0.3),Math.round(cs*0.56),Math.round(cs*0.38),dk?'#5a3a22':'#8a5830');
+      circ(ctx,px+cs*0.68,py+cs*0.5,1.5,dk?'#e0c060':'#b09030');
+    }},
+    // 9 — torch on floor
+    {edges:['F','F','F','F'],w:0.8,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,dk?'#1e1830':'#ede8f5');
+      // stick
+      r(ctx,px+Math.round(cs*0.44),py+Math.round(cs*0.48),Math.round(cs*0.12),Math.round(cs*0.34),dk?'#6b4226':'#8b5530');
+      // glow
+      ctx.beginPath();ctx.arc(px+cs/2,py+cs*0.38,cs*0.22,0,Math.PI*2);
+      ctx.fillStyle=dk?'rgba(255,140,0,0.12)':'rgba(255,140,0,0.2)';ctx.fill();
+      // flame
+      ctx.beginPath();ctx.ellipse(px+cs/2,py+cs*0.38,cs*0.1,cs*0.16,0,0,Math.PI*2);
+      ctx.fillStyle='#ff9933';ctx.fill();
+      ctx.beginPath();ctx.ellipse(px+cs/2,py+cs*0.36,cs*0.06,cs*0.1,0,0,Math.PI*2);
+      ctx.fillStyle='#ffee55';ctx.fill();
+    }},
+  ]
+};
 
-  osc.start();
-  gain.gain.setValueAtTime(0.1, ctxAudio.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, ctxAudio.currentTime + duration);
+// ── CIRCUIT ───────────────────────────────────────
+// Sockets: T=trace, O=empty
+const CIRCUIT = {
+  label:'Circuit',
+  compat:{ T:['T'], O:['O'] },
+  legend:[
+    {c:'#0d1208',l:'Substrate'},{c:'#22aa44',l:'Trace'},{c:'#0055aa',l:'Chip'},{c:'#00aaff',l:'Via'},
+  ],
+  tiles:[
+    // 0 — empty substrate
+    {edges:['O','O','O','O'],w:4,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,dk?'#0d1208':'#dce8d4');
+    }},
+    // 1 — trace horizontal (O N+S, T E+W)
+    {edges:['O','T','O','T'],w:5,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,dk?'#0d1208':'#dce8d4');
+      const th=Math.round(cs*0.26), ty=py+Math.round((cs-th)/2);
+      r(ctx,px,ty,cs,th,dk?'#196b28':'#289a3a');
+      r(ctx,px,ty+1,cs,th-2,dk?'#22aa40':'#33bb4a');
+      ln(ctx,px,ty+1,px+cs,ty+1,dk?'rgba(120,255,120,0.2)':'rgba(255,255,255,0.4)',0.5);
+    }},
+    // 2 — trace vertical (T N+S, O E+W)
+    {edges:['T','O','T','O'],w:5,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,dk?'#0d1208':'#dce8d4');
+      const tw=Math.round(cs*0.26), tx=px+Math.round((cs-tw)/2);
+      r(ctx,tx,py,tw,cs,dk?'#196b28':'#289a3a');
+      r(ctx,tx+1,py,tw-2,cs,dk?'#22aa40':'#33bb4a');
+      ln(ctx,tx+1,py,tx+1,py+cs,dk?'rgba(120,255,120,0.2)':'rgba(255,255,255,0.4)',0.5);
+    }},
+    // 3 — cross (T all)
+    {edges:['T','T','T','T'],w:1.5,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,dk?'#0d1208':'#dce8d4');
+      const s=Math.round(cs*0.26), mx=px+Math.round((cs-s)/2), my=py+Math.round((cs-s)/2);
+      r(ctx,px,my,cs,s,dk?'#196b28':'#289a3a');
+      r(ctx,mx,py,s,cs,dk?'#196b28':'#289a3a');
+      r(ctx,px,my+1,cs,s-2,dk?'#22aa40':'#33bb4a');
+      r(ctx,mx+1,py,s-2,cs,dk?'#22aa40':'#33bb4a');
+    }},
+    // 4 — turn NE (T N+E)
+    {edges:['T','T','O','O'],w:2,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,dk?'#0d1208':'#dce8d4');
+      const s=Math.round(cs*0.26), mx=px+Math.round((cs-s)/2), my=py+Math.round((cs-s)/2);
+      r(ctx,mx,py,s,my-py+s,dk?'#196b28':'#289a3a');
+      r(ctx,mx,my,px+cs-mx,s,dk?'#196b28':'#289a3a');
+      r(ctx,mx+1,py,s-2,my-py+s,dk?'#22aa40':'#33bb4a');
+      r(ctx,mx,my+1,px+cs-mx,s-2,dk?'#22aa40':'#33bb4a');
+    }},
+    // 5 — turn SE (T S+E)
+    {edges:['O','T','T','O'],w:2,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,dk?'#0d1208':'#dce8d4');
+      const s=Math.round(cs*0.26), mx=px+Math.round((cs-s)/2), my=py+Math.round((cs-s)/2);
+      r(ctx,mx,my,cs-mx+px,s,dk?'#196b28':'#289a3a');
+      r(ctx,mx,my,s,cs-my+py,dk?'#196b28':'#289a3a');
+      r(ctx,mx,my+1,cs-mx+px,s-2,dk?'#22aa40':'#33bb4a');
+      r(ctx,mx+1,my,s-2,cs-my+py,dk?'#22aa40':'#33bb4a');
+    }},
+    // 6 — turn SW (T S+W)
+    {edges:['O','O','T','T'],w:2,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,dk?'#0d1208':'#dce8d4');
+      const s=Math.round(cs*0.26), mx=px+Math.round((cs-s)/2), my=py+Math.round((cs-s)/2);
+      r(ctx,px,my,mx-px+s,s,dk?'#196b28':'#289a3a');
+      r(ctx,mx,my,s,cs-my+py,dk?'#196b28':'#289a3a');
+      r(ctx,px,my+1,mx-px+s,s-2,dk?'#22aa40':'#33bb4a');
+      r(ctx,mx+1,my,s-2,cs-my+py,dk?'#22aa40':'#33bb4a');
+    }},
+    // 7 — turn NW (T N+W)
+    {edges:['T','O','O','T'],w:2,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,dk?'#0d1208':'#dce8d4');
+      const s=Math.round(cs*0.26), mx=px+Math.round((cs-s)/2), my=py+Math.round((cs-s)/2);
+      r(ctx,px,my,mx-px+s,s,dk?'#196b28':'#289a3a');
+      r(ctx,mx,py,s,my-py+s,dk?'#196b28':'#289a3a');
+      r(ctx,px,my+1,mx-px+s,s-2,dk?'#22aa40':'#33bb4a');
+      r(ctx,mx+1,py,s-2,my-py+s,dk?'#22aa40':'#33bb4a');
+    }},
+    // 8 — IC chip (all T, distinct body)
+    {edges:['T','T','T','T'],w:0.6,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,dk?'#0d1208':'#dce8d4');
+      const s=Math.round(cs*0.26), mx=px+Math.round((cs-s)/2), my=py+Math.round((cs-s)/2);
+      r(ctx,px,my,cs,s,dk?'#196b28':'#289a3a'); r(ctx,mx,py,s,cs,dk?'#196b28':'#289a3a');
+      // chip body
+      const bx=px+Math.round(cs*0.22), by=py+Math.round(cs*0.22), bs=Math.round(cs*0.56);
+      r(ctx,bx,by,bs,bs,dk?'#003a6a':'#1155aa');
+      r(ctx,bx+1,by+1,bs-2,bs-2,dk?'#004a88':'#2266cc');
+      // pin dots
+      ctx.fillStyle=dk?'#88ccff':'#2299ff';
+      for(let i=0;i<3;i++){ctx.fillRect(bx+3+i*Math.floor((bs-6)/2),by+2,2,2);ctx.fillRect(bx+3+i*Math.floor((bs-6)/2),by+bs-4,2,2);}
+    }},
+    // 9 — via pad (O all)
+    {edges:['O','O','O','O'],w:0.8,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,dk?'#0d1208':'#dce8d4');
+      circ(ctx,px+cs/2,py+cs/2,cs*0.28,dk?'#003355':'#0055aa');
+      circ(ctx,px+cs/2,py+cs/2,cs*0.18,dk?'#0077bb':'#0088dd');
+      circ(ctx,px+cs/2,py+cs/2,cs*0.08,'#aaddff');
+    }},
+  ]
+};
 
-  osc.stop(ctxAudio.currentTime + duration);
-}
+// ── TERRAIN ───────────────────────────────────────
+// Sockets: W=water, S=shore, G=ground, M=mountain
+const TERRAIN = {
+  label:'Terrain',
+  compat:{ W:['W','S'], S:['S','W','G'], G:['G','S','M'], M:['M','G'] },
+  legend:[
+    {c:'#0a2040',l:'Water'},{c:'#3a7a3a',l:'Grass'},{c:'#c8a96e',l:'Sand'},{c:'#6a6a7a',l:'Mountain'},
+  ],
+  tiles:[
+    // 0 — deep water
+    {edges:['W','W','W','W'],w:3,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,'#0a2040');
+      ln(ctx,px+2,py+Math.round(cs*0.35),px+cs-2,py+Math.round(cs*0.35),'rgba(40,120,200,0.45)',0.7);
+      ln(ctx,px+3,py+Math.round(cs*0.62),px+cs-3,py+Math.round(cs*0.62),'rgba(40,120,200,0.35)',0.7);
+    }},
+    // 1 — shallow / shore water
+    {edges:['S','S','S','S'],w:2,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,'#1a4a7a');
+      ln(ctx,px+1,py+Math.round(cs*0.38),px+cs-1,py+Math.round(cs*0.38),'rgba(80,160,220,0.5)',0.7);
+      ln(ctx,px+2,py+Math.round(cs*0.65),px+cs-2,py+Math.round(cs*0.65),'rgba(80,160,220,0.4)',0.7);
+    }},
+    // 2 — sand
+    {edges:['G','G','G','G'],w:2,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,'#c8a96e');
+      ctx.fillStyle='rgba(160,120,60,0.35)';
+      [[2,3],[7,6],[4,10],[11,4],[9,13]].forEach(([dx,dy])=>ctx.fillRect(px+dx,py+dy,2,1));
+    }},
+    // 3 — grass plain
+    {edges:['G','G','G','G'],w:6,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,'#3a7a3a');
+      ctx.fillStyle='rgba(50,110,50,0.5)';
+      [[3,2],[8,5],[2,9],[11,8],[5,13],[9,13]].forEach(([dx,dy])=>ctx.fillRect(px+dx,py+dy,1,3));
+    }},
+    // 4 — forest
+    {edges:['G','G','G','G'],w:2.5,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,'#2a5a2a');
+      const tree=(tx,ty,scale=1)=>{
+        ctx.beginPath();ctx.moveTo(tx,ty);ctx.lineTo(tx-cs*0.14*scale,ty+cs*0.52*scale);ctx.lineTo(tx+cs*0.14*scale,ty+cs*0.52*scale);ctx.closePath();
+        ctx.fillStyle='#1a4018';ctx.fill();
+        ctx.beginPath();ctx.moveTo(tx,ty+cs*0.08*scale);ctx.lineTo(tx-cs*0.11*scale,ty+cs*0.52*scale);ctx.lineTo(tx+cs*0.11*scale,ty+cs*0.52*scale);ctx.closePath();
+        ctx.fillStyle='#226022';ctx.fill();
+      };
+      tree(px+cs*0.28,py+cs*0.1,0.9);tree(px+cs*0.72,py+cs*0.1,0.9);
+      r(ctx,px+cs*0.25,py+cs*0.62,cs*0.08,cs*0.2,'#3a2010');r(ctx,px+cs*0.69,py+cs*0.62,cs*0.06,cs*0.2,'#3a2010');
+    }},
+    // 5 — hill (G N+S, M E+W)
+    {edges:['G','M','G','M'],w:1.5,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,'#7a6a5a');
+      ctx.beginPath();ctx.ellipse(px+cs/2,py+cs*0.72,cs*0.46,cs*0.3,0,Math.PI,0);
+      ctx.fillStyle='#5a5050';ctx.fill();
+      ctx.beginPath();ctx.ellipse(px+cs/2,py+cs*0.68,cs*0.34,cs*0.22,0,Math.PI,0);
+      ctx.fillStyle='#6a6060';ctx.fill();
+    }},
+    // 6 — mountain
+    {edges:['M','M','M','M'],w:2,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,'#565666');
+      ctx.beginPath();ctx.moveTo(px+cs/2,py+cs*0.1);ctx.lineTo(px+cs*0.08,py+cs*0.88);ctx.lineTo(px+cs*0.92,py+cs*0.88);ctx.closePath();
+      ctx.fillStyle='#6a6a7a';ctx.fill();
+      ctx.beginPath();ctx.moveTo(px+cs/2,py+cs*0.1);ctx.lineTo(px+cs*0.34,py+cs*0.4);ctx.lineTo(px+cs*0.66,py+cs*0.4);ctx.closePath();
+      ctx.fillStyle='#d8dce8';ctx.fill();
+    }},
+    // 7 — snow peak
+    {edges:['M','M','M','M'],w:0.8,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,'#464656');
+      ctx.beginPath();ctx.moveTo(px+cs/2,py+cs*0.08);ctx.lineTo(px+cs*0.06,py+cs*0.88);ctx.lineTo(px+cs*0.94,py+cs*0.88);ctx.closePath();
+      ctx.fillStyle='#7a7a8a';ctx.fill();
+      ctx.beginPath();ctx.moveTo(px+cs/2,py+cs*0.08);ctx.lineTo(px+cs*0.28,py+cs*0.44);ctx.lineTo(px+cs*0.72,py+cs*0.44);ctx.closePath();
+      ctx.fillStyle='#eef0fa';ctx.fill();
+    }},
+    // 8 — beach NE corner (S N+W, G S+E)
+    {edges:['S','G','G','S'],w:1.2,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,'#c8a96e');
+      r(ctx,px,py,Math.round(cs*0.42),cs,'#1a4a7a');
+      r(ctx,px,py,cs,Math.round(cs*0.42),'#1a4a7a');
+    }},
+    // 9 — beach SW corner (G N+E, S S+W)
+    {edges:['G','G','S','S'],w:1.2,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,'#c8a96e');
+      r(ctx,px+Math.round(cs*0.58),py,cs-Math.round(cs*0.58),cs,'#1a4a7a');
+      r(ctx,px,py+Math.round(cs*0.58),cs,cs-Math.round(cs*0.58),'#1a4a7a');
+    }},
+  ]
+};
 
-// ---------- CONFIG ----------
-const N = 30;
-const CELL = 20;
+// ── PIPES ─────────────────────────────────────────
+// Sockets: P=pipe, X=no-pipe
+const PIPES = {
+  label:'Pipes',
+  compat:{ P:['P'], X:['X'] },
+  legend:[
+    {c:'#111120',l:'Empty'},{c:'#4477bb',l:'Pipe'},{c:'#cc3333',l:'Valve'},{c:'#33aa66',l:'Pump'},
+  ],
+  tiles:[
+    // 0 — empty
+    {edges:['X','X','X','X'],w:3,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,dk?'#111120':'#e8e8f4');
+    }},
+    // 1 — pipe horizontal
+    {edges:['X','P','X','P'],w:5,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,dk?'#111120':'#e8e8f4');
+      const h=Math.round(cs*0.32), y0=py+Math.round((cs-h)/2);
+      r(ctx,px,y0,cs,h,dk?'#2a4466':'#6688bb');
+      r(ctx,px,y0+1,cs,h-2,dk?'#3a5588':'#7799cc');
+      ln(ctx,px,y0+2,px+cs,y0+2,dk?'rgba(180,210,255,0.2)':'rgba(255,255,255,0.5)',0.5);
+    }},
+    // 2 — pipe vertical
+    {edges:['P','X','P','X'],w:5,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,dk?'#111120':'#e8e8f4');
+      const w=Math.round(cs*0.32), x0=px+Math.round((cs-w)/2);
+      r(ctx,x0,py,w,cs,dk?'#2a4466':'#6688bb');
+      r(ctx,x0+1,py,w-2,cs,dk?'#3a5588':'#7799cc');
+      ln(ctx,x0+2,py,x0+2,py+cs,dk?'rgba(180,210,255,0.2)':'rgba(255,255,255,0.5)',0.5);
+    }},
+    // 3 — cross
+    {edges:['P','P','P','P'],w:1.2,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,dk?'#111120':'#e8e8f4');
+      const s=Math.round(cs*0.32), mx=px+Math.round((cs-s)/2), my=py+Math.round((cs-s)/2);
+      r(ctx,px,my,cs,s,dk?'#2a4466':'#6688bb');r(ctx,mx,py,s,cs,dk?'#2a4466':'#6688bb');
+      r(ctx,px,my+1,cs,s-2,dk?'#3a5588':'#7799cc');r(ctx,mx+1,py,s-2,cs,dk?'#3a5588':'#7799cc');
+      // joint cap
+      r(ctx,mx,my,s,s,dk?'#4466aa':'#8899cc');
+    }},
+    // 4 — turn NE
+    {edges:['P','P','X','X'],w:1.8,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,dk?'#111120':'#e8e8f4');
+      const s=Math.round(cs*0.32), mx=px+Math.round((cs-s)/2), my=py+Math.round((cs-s)/2);
+      r(ctx,mx,py,s,my-py+s,dk?'#2a4466':'#6688bb');r(ctx,mx,my,px+cs-mx,s,dk?'#2a4466':'#6688bb');
+      r(ctx,mx+1,py,s-2,my-py+s,dk?'#3a5588':'#7799cc');r(ctx,mx,my+1,px+cs-mx,s-2,dk?'#3a5588':'#7799cc');
+    }},
+    // 5 — turn SE
+    {edges:['X','P','P','X'],w:1.8,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,dk?'#111120':'#e8e8f4');
+      const s=Math.round(cs*0.32), mx=px+Math.round((cs-s)/2), my=py+Math.round((cs-s)/2);
+      r(ctx,mx,my,px+cs-mx,s,dk?'#2a4466':'#6688bb');r(ctx,mx,my,s,py+cs-my,dk?'#2a4466':'#6688bb');
+      r(ctx,mx,my+1,px+cs-mx,s-2,dk?'#3a5588':'#7799cc');r(ctx,mx+1,my,s-2,py+cs-my,dk?'#3a5588':'#7799cc');
+    }},
+    // 6 — turn SW
+    {edges:['X','X','P','P'],w:1.8,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,dk?'#111120':'#e8e8f4');
+      const s=Math.round(cs*0.32), mx=px+Math.round((cs-s)/2), my=py+Math.round((cs-s)/2);
+      r(ctx,px,my,mx-px+s,s,dk?'#2a4466':'#6688bb');r(ctx,mx,my,s,py+cs-my,dk?'#2a4466':'#6688bb');
+      r(ctx,px,my+1,mx-px+s,s-2,dk?'#3a5588':'#7799cc');r(ctx,mx+1,my,s-2,py+cs-my,dk?'#3a5588':'#7799cc');
+    }},
+    // 7 — turn NW
+    {edges:['P','X','X','P'],w:1.8,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,dk?'#111120':'#e8e8f4');
+      const s=Math.round(cs*0.32), mx=px+Math.round((cs-s)/2), my=py+Math.round((cs-s)/2);
+      r(ctx,px,my,mx-px+s,s,dk?'#2a4466':'#6688bb');r(ctx,mx,py,s,my-py+s,dk?'#2a4466':'#6688bb');
+      r(ctx,px,my+1,mx-px+s,s-2,dk?'#3a5588':'#7799cc');r(ctx,mx+1,py,s-2,my-py+s,dk?'#3a5588':'#7799cc');
+    }},
+    // 8 — valve (horizontal pipe + wheel)
+    {edges:['X','P','X','P'],w:0.8,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,dk?'#111120':'#e8e8f4');
+      const h=Math.round(cs*0.32), y0=py+Math.round((cs-h)/2);
+      r(ctx,px,y0,cs,h,dk?'#2a4466':'#6688bb');r(ctx,px,y0+1,cs,h-2,dk?'#3a5588':'#7799cc');
+      circ(ctx,px+cs/2,py+cs/2,cs*0.24,dk?'#771111':'#cc2222');
+      circ(ctx,px+cs/2,py+cs/2,cs*0.16,dk?'#aa2222':'#dd4444');
+      ln(ctx,px+cs/2-cs*0.22,py+cs/2,px+cs/2+cs*0.22,py+cs/2,'#ff7766',1.5);
+      ln(ctx,px+cs/2,py+cs/2-cs*0.22,px+cs/2,py+cs/2+cs*0.22,'#ff7766',1.5);
+      circ(ctx,px+cs/2,py+cs/2,cs*0.06,dk?'#ff9988':'#ffcccc');
+    }},
+    // 9 — pump (vertical pipe + housing)
+    {edges:['P','X','P','X'],w:0.8,draw(ctx,px,py,cs,dk){
+      r(ctx,px,py,cs,cs,dk?'#111120':'#e8e8f4');
+      const w=Math.round(cs*0.32), x0=px+Math.round((cs-w)/2);
+      r(ctx,x0,py,w,cs,dk?'#2a4466':'#6688bb');r(ctx,x0+1,py,w-2,cs,dk?'#3a5588':'#7799cc');
+      r(ctx,px+Math.round(cs*0.16),py+Math.round(cs*0.28),Math.round(cs*0.68),Math.round(cs*0.44),dk?'#1a5533':'#2a7744');
+      r(ctx,px+Math.round(cs*0.2),py+Math.round(cs*0.32),Math.round(cs*0.6),Math.round(cs*0.36),dk?'#226644':'#33aa66');
+      circ(ctx,px+cs/2,py+cs/2,cs*0.12,dk?'#44dd88':'#33cc77');
+    }},
+  ]
+};
 
-// Tiles: road system
-// edges: [top, right, bottom, left]
-const tiles = [
-  {id:0, color:"#111", edges:[0,0,0,0]}, // empty
-  {id:1, color:"#4caf50", edges:[1,1,1,1]}, // cross
-  {id:2, color:"#2196f3", edges:[1,0,1,0]}, // vertical
-  {id:3, color:"#ff9800", edges:[0,1,0,1]}, // horizontal
-  {id:4, color:"#e91e63", edges:[1,1,0,0]}, // corner
-];
+const TILESETS = { dungeon:DUNGEON, circuit:CIRCUIT, terrain:TERRAIN, pipes:PIPES };
 
-let grid, interval;
-
-// ---------- INIT ----------
-function init(){
-  grid=[];
-  for(let y=0;y<N;y++){
-    let row=[];
-    for(let x=0;x<N;x++){
-      row.push({
-        options: tiles.map(t=>t.id),
-        collapsed:false
-      });
-    }
-    grid.push(row);
+// ════════════════════════════════════════════════════
+//  WFC ENGINE
+// ════════════════════════════════════════════════════
+class WFC {
+  constructor(W,H,ts){
+    this.W=W;this.H=H;this.ts=ts;
+    this.tiles=ts.tiles;this.compat=ts.compat;this.N=ts.tiles.length;
+    this.reset();
   }
-}
-
-// ---------- CORE ----------
-function entropy(c){ return c.options.length; }
-
-function pickCell(){
-  let min=999, list=[];
-  for(let y=0;y<N;y++){
-    for(let x=0;x<N;x++){
-      let c=grid[y][x];
-      if(!c.collapsed){
-        let e=entropy(c);
-        if(e<min){ min=e; list=[{x,y}]; }
-        else if(e===min) list.push({x,y});
-      }
-    }
+  reset(){
+    const full=new Set(this.tiles.map((_,i)=>i));
+    this.cells=Array.from({length:this.H},()=>Array.from({length:this.W},()=>new Set(full)));
+    this.done=false;this.contradiction=false;this.steps=0;
   }
-  return list.length ? list[Math.floor(Math.random()*list.length)] : null;
-}
-
-function collapse(x,y){
-  let c=grid[y][x];
-  if(c.options.length===0) return false;
-
-  let pick=c.options[Math.floor(Math.random()*c.options.length)];
-  c.options=[pick];
-  c.collapsed=true;
-
-  beep(600); // sound
-  return true;
-}
-
-function valid(a,b,dir){
-  return tiles[a].edges[dir] === tiles[b].edges[(dir+2)%4];
-}
-
-function neighbors(x,y){
-  return [
-    {x,y:y-1,dir:0},
-    {x:x+1,y,dir:1},
-    {x,y:y+1,dir:2},
-    {x:x-1,y,dir:3}
-  ].filter(n=>n.x>=0&&n.y>=0&&n.x<N&&n.y<N);
-}
-
-function propagate(){
-  let changed=true;
-
-  while(changed){
-    changed=false;
-
-    for(let y=0;y<N;y++){
-      for(let x=0;x<N;x++){
-        let cell=grid[y][x];
-
-        for(let n of neighbors(x,y)){
-          let nb=grid[n.y][n.x];
-          let newOpts=[];
-
-          for(let opt of nb.options){
-            let ok=false;
-            for(let my of cell.options){
-              if(valid(my,opt,n.dir)){ ok=true; break; }
-            }
-            if(ok) newOpts.push(opt);
-          }
-
-          if(newOpts.length===0){
-            beep(120,0.2); // contradiction sound
-            return false;
-          }
-
-          if(newOpts.length < nb.options.length){
-            nb.options=newOpts;
-            changed=true;
-          }
+  pickCell(){
+    let minE=Infinity,picks=[];
+    for(let y=0;y<this.H;y++)for(let x=0;x<this.W;x++){
+      const e=this.cells[y][x].size;
+      if(e<=1)continue;
+      if(e<minE){minE=e;picks=[[x,y]];}else if(e===minE)picks.push([x,y]);
+    }
+    return picks.length?picks[Math.floor(Math.random()*picks.length)]:null;
+  }
+  collapse(x,y){
+    const opts=[...this.cells[y][x]];
+    const ws=opts.map(i=>this.tiles[i].w);
+    const tot=ws.reduce((a,b)=>a+b,0);
+    let rnd=Math.random()*tot,chosen=opts[opts.length-1];
+    for(let i=0;i<opts.length;i++){rnd-=ws[i];if(rnd<=0){chosen=opts[i];break;}}
+    this.cells[y][x]=new Set([chosen]);
+  }
+  compatible(a,b,dir){
+    const eA=this.tiles[a].edges[dir];
+    const eB=this.tiles[b].edges[(dir+2)%4];
+    return (this.compat[eA]||[]).includes(eB);
+  }
+  propagate(sx,sy){
+    const q=[[sx,sy]],inq=new Set([`${sx},${sy}`]);
+    const D=[[0,-1],[1,0],[0,1],[-1,0]];
+    while(q.length){
+      const[cx,cy]=q.shift();inq.delete(`${cx},${cy}`);
+      for(let d=0;d<4;d++){
+        const nx=cx+D[d][0],ny=cy+D[d][1];
+        if(nx<0||ny<0||nx>=this.W||ny>=this.H)continue;
+        const nb=this.cells[ny][nx];if(nb.size===0)continue;
+        const cur=this.cells[cy][cx];
+        const rm=[];
+        for(const t of nb){let ok=false;for(const c of cur)if(this.compatible(c,t,d)){ok=true;break;}if(!ok)rm.push(t);}
+        if(rm.length){
+          for(const t of rm)nb.delete(t);
+          if(nb.size===0){this.contradiction=true;return;}
+          const k=`${nx},${ny}`;if(!inq.has(k)){q.push([nx,ny]);inq.add(k);}
         }
       }
     }
   }
-  return true;
-}
-
-// ---------- CONTROL ----------
-function step(){
-  let p=pickCell();
-  if(!p) return;
-
-  if(!collapse(p.x,p.y) || !propagate()){
-    reset();
-    return;
+  step(){
+    if(this.done||this.contradiction)return;
+    this.steps++;
+    const pos=this.pickCell();
+    if(!pos){this.done=true;return;}
+    const[x,y]=pos;
+    this.collapse(x,y);this.propagate(x,y);
   }
-  draw();
+  countCollapsed(){
+    let c=0;
+    for(let y=0;y<this.H;y++)for(let x=0;x<this.W;x++)if(this.cells[y][x].size===1)c++;
+    return c;
+  }
 }
 
-function run(){
-  pause();
-  let speed=document.getElementById("speed").value;
+// ════════════════════════════════════════════════════
+//  RENDERER
+// ════════════════════════════════════════════════════
+const canvas=document.getElementById('c');
+const ctx=canvas.getContext('2d');
+canvas.width=GW*CS;canvas.height=GH*CS;
+document.getElementById('canvas-wrap').style.cssText=`width:${canvas.width}px;height:${canvas.height}px`;
 
-  interval=setInterval(()=>{
-    let p=pickCell();
-    if(!p){ pause(); return; }
+const isDark=()=>document.documentElement.dataset.theme==='dark';
 
-    if(!collapse(p.x,p.y) || !propagate()){
-      reset();
-      return;
-    }
-    draw();
-  }, speed);
+function entropyBg(e,maxE){
+  const dk=isDark(),t=(e-1)/(maxE-1+0.001);
+  if(dk){const rr=Math.round(18+t*55),g=Math.round(10+t*18),b=Math.round(38+t*75);return `rgb(${rr},${g},${b})`;}
+  else{const rr=Math.round(205+t*25),g=Math.round(200+t*15),b=Math.round(235-t*15);return `rgb(${rr},${g},${b})`;}
 }
 
-function pause(){
-  clearInterval(interval);
-}
-
-function reset(){
-  pause();
-  init();
-  draw();
-}
-
-// ---------- DRAW ----------
-function draw(){
-  let ctx = document.getElementById("grid").getContext("2d");
-  let heat = document.getElementById("heatmap").checked;
-
-  for(let y=0;y<N;y++){
-    for(let x=0;x<N;x++){
-      let c=grid[y][x];
-
-      if(c.collapsed){
-        ctx.fillStyle=tiles[c.options[0]].color;
-      } else if(heat){
-        let v=255 - c.options.length*30;
-        ctx.fillStyle=`rgb(${v},${v},${v})`;
+function drawGrid(wfc){
+  const maxE=wfc.N,dk=isDark();
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  for(let y=0;y<GH;y++){
+    for(let x=0;x<GW;x++){
+      const cell=wfc.cells[y][x];
+      const px=x*CS,py=y*CS;
+      if(cell.size===0){
+        r(ctx,px,py,CS,CS,'#ff1133');
+        ctx.fillStyle='#fff';ctx.font=`bold ${CS*0.48}px monospace`;
+        ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.fillText('✕',px+CS/2,py+CS/2+0.5);
+      } else if(cell.size===1){
+        wfc.ts.tiles[[...cell][0]].draw(ctx,px,py,CS,dk);
       } else {
-        ctx.fillStyle="#666";
+        r(ctx,px,py,CS,CS,entropyBg(cell.size,maxE));
+        ctx.fillStyle=dk?'rgba(255,255,255,0.2)':'rgba(0,0,60,0.22)';
+        ctx.font=`${Math.round(CS*0.37)}px monospace`;
+        ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.fillText(cell.size,px+CS/2,py+CS/2+0.5);
       }
-
-      ctx.fillRect(x*CELL,y*CELL,CELL,CELL);
+      ctx.strokeStyle=dk?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.07)';
+      ctx.lineWidth=0.5;ctx.strokeRect(px,py,CS,CS);
     }
   }
 }
 
-// ---------- INSPECT ----------
-document.getElementById("grid").addEventListener("click", e=>{
-  let rect=e.target.getBoundingClientRect();
-  let x=Math.floor((e.clientX-rect.left)/CELL);
-  let y=Math.floor((e.clientY-rect.top)/CELL);
+// ════════════════════════════════════════════════════
+//  APP STATE
+// ════════════════════════════════════════════════════
+let currentTs='dungeon';
+let wfc=new WFC(GW,GH,TILESETS[currentTs]);
+let running=false,rafId=null,lastTime=0,restarts=0;
 
-  let cell=grid[y][x];
-  document.getElementById("info").innerText =
-    `Cell (${x},${y}) → options: [${cell.options.join(", ")}]`;
+const overlay=document.getElementById('overlay');
+const progFill=document.getElementById('prog-fill');
+const sDone=document.getElementById('s-done');
+const sLeft=document.getElementById('s-left');
+const sRestart=document.getElementById('s-restart');
+const sStep=document.getElementById('s-step');
+const speedEl=document.getElementById('speed');
+const btnRun=document.getElementById('btn-run');
+const legendEl=document.getElementById('legend');
+
+function updateStats(){
+  const c=wfc.countCollapsed(),tot=wfc.W*wfc.H;
+  sDone.textContent=c;sLeft.textContent=tot-c;
+  sRestart.textContent=restarts;sStep.textContent=wfc.steps;
+  progFill.style.width=((c/tot)*100).toFixed(1)+'%';
+}
+
+function buildLegend(tsKey){
+  legendEl.innerHTML='';
+  TILESETS[tsKey].legend.forEach(({c,l})=>{
+    const d=document.createElement('div');d.className='leg';
+    const sw=document.createElement('div');sw.className='leg-sw';sw.style.background=c;
+    const sp=document.createElement('span');sp.textContent=l;
+    d.appendChild(sw);d.appendChild(sp);legendEl.appendChild(d);
+  });
+}
+
+function resetAll(){
+  wfc=new WFC(GW,GH,TILESETS[currentTs]);
+  drawGrid(wfc);updateStats();buildLegend(currentTs);
+}
+
+let contraTimer=null;
+function flashContradiction(){
+  overlay.classList.add('show');
+  clearTimeout(contraTimer);
+  contraTimer=setTimeout(()=>overlay.classList.remove('show'),380);
+}
+
+function loop(now){
+  if(!running)return;
+  const spd=parseFloat(speedEl.value);
+  const interval=Math.max(4,550/Math.pow(spd,1.05));
+  const spf=Math.max(1,Math.floor(spd/16));
+  if(now-lastTime>=interval){
+    lastTime=now;
+    for(let i=0;i<spf;i++){
+      if(wfc.done){running=false;btnRun.textContent='▶ Run';drawGrid(wfc);updateStats();return;}
+      if(wfc.contradiction){restarts++;flashContradiction();wfc=new WFC(GW,GH,TILESETS[currentTs]);break;}
+      wfc.step();
+    }
+    drawGrid(wfc);updateStats();
+  }
+  rafId=requestAnimationFrame(loop);
+}
+
+btnRun.addEventListener('click',()=>{
+  if(wfc.done){wfc=new WFC(GW,GH,TILESETS[currentTs]);restarts=0;}
+  running=!running;
+  btnRun.textContent=running?'⏸ Pause':'▶ Run';
+  if(running){lastTime=0;rafId=requestAnimationFrame(loop);}
+  else cancelAnimationFrame(rafId);
 });
 
-// ---------- START ----------
-init();
-draw();
-</script>
+document.getElementById('btn-step').addEventListener('click',()=>{
+  if(running)return;
+  if(wfc.done)wfc=new WFC(GW,GH,TILESETS[currentTs]);
+  if(wfc.contradiction){restarts++;wfc=new WFC(GW,GH,TILESETS[currentTs]);}
+  wfc.step();drawGrid(wfc);updateStats();
+});
 
+document.getElementById('btn-reset').addEventListener('click',()=>{
+  if(running){running=false;btnRun.textContent='▶ Run';cancelAnimationFrame(rafId);}
+  restarts=0;resetAll();
+});
+
+document.getElementById('ts-row').addEventListener('click',e=>{
+  const btn=e.target.closest('.ts-btn');if(!btn)return;
+  document.querySelectorAll('.ts-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');currentTs=btn.dataset.ts;
+  if(running){running=false;btnRun.textContent='▶ Run';cancelAnimationFrame(rafId);}
+  restarts=0;resetAll();
+});
+
+document.getElementById('theme-btn').addEventListener('click',()=>{
+  const dk=document.documentElement.dataset.theme==='dark';
+  document.documentElement.dataset.theme=dk?'light':'dark';
+  document.getElementById('theme-btn').textContent=dk?'🌙 Dark':'☀ Light';
+  drawGrid(wfc);
+});
+
+resetAll();
+</script>
 </body>
 </html>
