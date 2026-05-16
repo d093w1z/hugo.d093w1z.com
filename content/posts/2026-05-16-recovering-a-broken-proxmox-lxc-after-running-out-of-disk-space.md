@@ -1,8 +1,8 @@
 ---
 author: d093w1z
 title: Recovering a Broken Proxmox LXC After Running Out of Disk Space
-date: 2026-05-15T22:11:27.000Z
-publishDate: 2026-05-16T00:00:00.000Z
+date: 2026-05-15T00:00:00.000Z
+publishDate: 2026-05-15T00:00:00.000Z
 description: >-
   A short overview of recovering broken Proxmox LXCs after a storage exhaustion
   incident, restructuring a Calibre deployment, and improving long-term storage
