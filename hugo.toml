@@ -5,6 +5,8 @@ languageCode = "en"
 defaultContentLanguage = "en"
 enableEmoji = true
 enableGitInfo = true
+sitemap = true
+disablePathToLower = true
 
 [pagination]
 pagerSize = 100
@@ -242,7 +244,3 @@ url = "contact/"
 # name = "Contato"
 # weight = 5
 # url = "contact/"
-
-
-sitemap = true
-disablePathToLower = true
