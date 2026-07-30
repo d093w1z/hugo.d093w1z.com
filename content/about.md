@@ -10,7 +10,7 @@ Hi, I'm Mukesh Tandale, known online as [**d093w1z**](/posts/2024-07-28-d093w1z/
 
 I'm a software developer with a strong foundation in C++, Linux systems, and modern web technologies like the MERN stack. Whether it's writing low-level code, building responsive web apps, or crafting CLI tools that actually make life easier, I thrive on building things that are fast, clean, and purposeful.
 
-Currently, I’m working at Dassault Systèmes, where I build robust solutions that power next-gen digital tools. I'm love constantly leveling up through side projects, open-source contributions, and deep technical reading.
+Currently, I’m working at Dassault Systèmes, where I build robust solutions that power next-gen digital tools. I love constantly leveling up through side projects, open-source contributions, and deep technical reading.
 
 **📍 Based in India | 🎓 B.E. in Computer Engineering**
 
