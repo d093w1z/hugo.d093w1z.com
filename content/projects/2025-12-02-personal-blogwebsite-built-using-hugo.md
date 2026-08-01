@@ -1,7 +1,6 @@
 ---
 title: Personal blog/website built using Hugo
 date: 2025-07-20T00:00:00.000Z
-description: This site itself — a static blog built with Hugo, Markdown content, and automated CI/CD deployment to GitHub Pages.
 tags:
   - hugo
   - portfolio
