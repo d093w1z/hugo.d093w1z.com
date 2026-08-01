@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<title>Piano Roll</title>
+<style>
+  :root{
+    --bg:#222;
+    --text:#ddd;
+    --border:#444;
+    --btn-bg:#333;
+    --btn-border:#555;
+    --btn-active:#555;
+    --cell-bg:#333;
+    --cell-border:#555;
+    --mark:#fff;
+    --white-key-bg:#eee;
+    --white-key-text:#000;
+    --black-key-bg:#444;
+    --black-key-text:#fff;
+    --playhead:#ff0;
+    --select:#0ff;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    font-family:sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    margin:0;
+    padding:16px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  h1{ font-size:16px; margin:0 0 2px 0; }
+  .sub{ color:#999; font-size:11px; margin-bottom:12px; text-align:center; }
+
+  #controls{
+    width:100%;
+    max-width:960px;
+    margin:10px 0;
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    align-items:flex-start;
+    gap:8px;
+  }
+  /* Each control group wraps onto its own line as a unit before its
+     individual controls start wrapping awkwardly mid-group. */
+  .group{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:6px;
+    background:#2a2a2a;
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:6px 8px;
+  }
+  .group-label{
+    font-size:9px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:#888;
+    margin-right:2px;
+    white-space:nowrap;
+  }
+  #controls input, #controls select, #controls button{
+    padding:6px 9px;
+    background:var(--btn-bg);
+    color:var(--text);
+    border:1px solid var(--btn-border);
+    border-radius:4px;
+    font-size:12px;
+  }
+  #controls button{ cursor:pointer; touch-action:manipulation; }
+  #controls button:hover{ background:#3d3d3d; }
+  #controls button.active{ background:var(--btn-active); border-color:#ddd; }
+  #controls input[type=number]{ width:58px; }
+  label.tag{ font-size:10px; color:#999; margin-right:2px; white-space:nowrap; }
+  #zoomVal{ font-size:10px; color:#999; min-width:2.5em; }
+
+  #main-container{
+    display:flex;
+    flex-direction:column;
+    flex-wrap:nowrap;
+    align-items:flex-start;
+    width:100%;
+    max-width:960px;
+    overflow-x:auto;
+    border:1px solid var(--border);
+    padding:6px;
+  }
+
+  #ruler-row{ display:flex; }
+  #ruler-spacer{ width:52px; flex-shrink:0; }
+  #ruler{ position:relative; height:14px; }
+  .tick{ position:absolute; top:0; bottom:0; border-left:1px solid var(--cell-border); }
+  .tick.bar{ border-left:1px solid var(--mark); }
+  .ticklabel{ position:absolute; top:-1px; font-size:9px; color:#999; }
+  .playline{ position:absolute; top:0; bottom:0; width:2px; background:var(--playhead); pointer-events:none; z-index:5; }
+
+  #piano-roll-container{ display:flex; }
+  #piano{ display:flex; flex-direction:column; margin-right:2px; width:50px; flex-shrink:0; }
+  .key{
+    height:16px;
+    background:var(--white-key-bg);
+    border:1px solid #000;
+    text-align:center;
+    line-height:16px;
+    font-size:10px;
+    color:var(--white-key-text);
+    cursor:pointer;
+    box-sizing:border-box;
+    touch-action:manipulation;
+  }
+  .key.black{ background:var(--black-key-bg); color:var(--black-key-text); }
+  .key.root-hl{ outline:2px solid var(--select); outline-offset:-2px; }
+
+  #piano-roll{
+    position:relative;
+    display:grid;
+    user-select:none;
+    background:#444;
+    touch-action:none;
+  }
+  .cell{
+    background:var(--cell-bg);
+    box-sizing:border-box;
+    border-right:1px solid var(--cell-border);
+    border-bottom:1px solid var(--cell-border);
+  }
+  .cell.bar-edge{ border-right-color:var(--mark); }
+  .cell.oct-edge{ border-bottom-color:var(--mark); }
+  .cell.scale-hl{ background:#3a4a33; }
+
+  .note{
+    position:absolute;
+    box-sizing:border-box;
+    border:1px solid #000;
+    cursor:grab;
+    z-index:2;
+  }
+  .note .rsz{ position:absolute; right:0; top:0; bottom:0; width:8px; cursor:ew-resize; }
+  .note.selected{ outline:2px solid var(--select); outline-offset:1px; z-index:3; }
+  .note.muted{ opacity:.3; }
+  .note.playing{ outline:2px solid var(--playhead); }
+
+  #marquee{
+    position:absolute;
+    border:1px dashed var(--select);
+    background:rgba(0,255,255,.12);
+    z-index:4;
+    pointer-events:none;
+    display:none;
+  }
+
+  #velocity-row{ display:flex; margin-top:4px; }
+  #velocity-lane{ position:relative; background:#2a2a2a; border-top:1px solid var(--border); height:60px; touch-action:none; }
+  .vbar{ position:absolute; bottom:0; background:#0f0; cursor:ns-resize; }
+  .vbar.selected{ outline:1px solid var(--select); }
+
+  .legend{
+    font-size:11px;
+    color:#999;
+    margin-top:12px;
+    max-width:960px;
+    text-align:center;
+    line-height:1.6;
+    padding:0 8px;
+  }
+  .legend b{ color:var(--text); }
+
+  @media (max-width:600px){
+    body{ padding:10px; }
+    .legend{ font-size:10px; }
+    #controls input, #controls select, #controls button{ padding:7px 8px; font-size:12px; }
+    #controls{ justify-content:stretch; }
+    .group{ flex:1 1 100%; justify-content:center; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Piano Roll</h1>
+<div class="sub" id="subline">4 bars &middot; 1/16 grid &middot; draw / select / chord / mute</div>
+
+<div id="controls">
+  <div class="group" data-group="transport">
+    <span class="group-label">Transport</span>
+    <button id="play">Play</button>
+    <button id="stop">Stop</button>
+    <label class="tag"><input type="checkbox" id="loop" checked style="margin-right:3px;">Loop</label>
+    <label class="tag">BPM</label>
+    <input type="number" id="bpm" value="120" min="30" max="300">
+    <label class="tag">Instrument</label>
+    <select id="instrument">
+      <option value="synth">Synth</option>
+      <option value="piano">Piano</option>
+      <option value="pluck">Pluck</option>
+    </select>
+  </div>
+
+  <div class="group" data-group="tools">
+    <span class="group-label">Tool</span>
+    <button class="active" data-tool="draw">Draw</button>
+    <button data-tool="select">Select</button>
+    <button data-tool="chord">Chord</button>
+    <button data-tool="mute">Mute</button>
+  </div>
+
+  <div class="group" data-group="grid">
+    <span class="group-label">Grid</span>
+    <label class="tag">Bars</label>
+    <select id="bars">
+      <option value="2">2</option>
+      <option value="4" selected>4</option>
+      <option value="8">8</option>
+      <option value="16">16</option>
+    </select>
+    <label class="tag">Snap</label>
+    <select id="snap">
+      <option value="1">1/32</option>
+      <option value="2" selected>1/16</option>
+      <option value="4">1/8</option>
+      <option value="8">1/4</option>
+      <option value="16">1 bar</option>
+      <option value="0">Off</option>
+    </select>
+    <label class="tag">Zoom</label>
+    <input type="range" id="zoom" min="6" max="36" value="16">
+    <span id="zoomVal">16px</span>
+    <button id="zoomSel" title="Fit the view to the current selection">Zoom Selection</button>
+    <button id="zoomFit" title="Fit the whole pattern in view">Zoom All</button>
+  </div>
+
+  <div class="group" data-group="musical">
+    <span class="group-label">Musical</span>
+    <label class="tag">Root</label>
+    <select id="root">
+      <option>C</option><option>C#</option><option>D</option><option>D#</option>
+      <option>E</option><option>F</option><option>F#</option><option>G</option>
+      <option>G#</option><option>A</option><option>A#</option><option>B</option>
+    </select>
+    <label class="tag">Scale</label>
+    <select id="scale">
+      <option value="">None</option>
+      <option value="major">Major</option>
+      <option value="minor">Minor</option>
+      <option value="dorian">Dorian</option>
+      <option value="mixolydian">Mixolydian</option>
+      <option value="pentatonic">Pentatonic</option>
+      <option value="blues">Blues</option>
+      <option value="harmonicMinor">Harmonic Minor</option>
+      <option value="melodicMinor">Melodic Minor</option>
+    </select>
+    <label class="tag">Chord</label>
+    <select id="chordtype">
+      <option value="major">Major</option>
+      <option value="minor">Minor</option>
+      <option value="dom7">Seventh</option>
+      <option value="maj9">Ninth</option>
+      <option value="sus4">Suspended</option>
+      <option value="dim">Diminished</option>
+      <option value="aug">Augmented</option>
+      <option value="power">Power</option>
+    </select>
+  </div>
+
+  <div class="group" data-group="edit">
+    <span class="group-label">Edit</span>
+    <button id="undo">Undo</button>
+    <button id="redo">Redo</button>
+    <button id="quantize">Quantize</button>
+    <button id="humanize">Humanize Vel</button>
+    <button id="clear">Clear All</button>
+  </div>
+
+  <div class="group" data-group="file">
+    <span class="group-label">File</span>
+    <button id="save">Save</button>
+    <button id="load">Load</button>
+    <button id="importMidi">Import MIDI</button>
+    <button id="export">Export MIDI</button>
+    <input type="file" id="importMidiFile" accept=".mid,.midi,audio/midi,audio/x-midi" style="display:none">
+  </div>
+</div>
+
+<div id="main-container">
+  <div id="ruler-row">
+    <div id="ruler-spacer"></div>
+    <div id="ruler"></div>
+  </div>
+  <div id="piano-roll-container">
+    <div id="piano"></div>
+    <div id="piano-roll">
+      <div id="marquee"></div>
+    </div>
+  </div>
+  <div id="velocity-row">
+    <div id="ruler-spacer"></div>
+    <div id="velocity-lane"></div>
+  </div>
+</div>
+
+<div class="legend">
+  <b>Draw</b> &mdash; drag along a row to set length, right-click (or drag) to erase, hold <b>Alt</b> to ignore snap &nbsp;|&nbsp;
+  <b>Select</b> &mdash; drag any selected note to move the whole selection, drag right edge to resize,
+  <b>Ctrl</b>+drag to clone, marquee to multi-select, Del to delete, Ctrl+C/V copy-paste, Ctrl+D duplicate,
+  <b>Shift</b>+drag locks to one axis &nbsp;|&nbsp;
+  <b>Chord</b> &mdash; click to stamp &nbsp;|&nbsp; <b>Mute</b> &mdash; click a note &nbsp;|&nbsp;
+  Ctrl/Alt/Cmd + wheel over the grid to zoom, middle-click drag to pan, Space to play/stop, B/S/C/M switch tools
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.39/Tone.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/midi-writer-js@2.1.3/browser/midiwriter.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tonejs/midi@2.0.28/build/Midi.js"></script>
+<script src="piano-roll.js"></script>
+</body>
+</html>
